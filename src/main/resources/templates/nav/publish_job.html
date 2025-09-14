@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发布职位 - 甄企宝</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+      background-color: #f8f9fa;
+      min-height: 100vh;
+    }
+
+    .navbar-placeholder {
+      height: 70px;
+      background-color: #2563eb;
+    }
+
+    .card-container {
+      background-color: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+
+    .header-bg {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: white;
+      padding: 1.5rem;
+    }
+
+    .form-section {
+      padding: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #1e293b;
+      border-bottom: 1px solid #dee2e6;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .benefit-tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 999px;
+      background-color: rgba(37, 99, 235, 0.1);
+      color: #2563eb;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .submit-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #dee2e6;
+    }
+
+    .btn-gradient {
+      background: linear-gradient(135deg, #2563eb, #4f46e5);
+      color: white;
+      border: none;
+      padding: 0.5rem 1.5rem;
+      border-radius: 0.5rem;
+    }
+
+    .btn-gradient:hover {
+      box-shadow: 0 0.5rem 1rem rgba(37, 99, 235, 0.3);
+    }
+
+    .toast-success {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background-color: #10b981;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      display: flex;
+      align-items: center;
+      transform: translateX(100%);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast-show {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    footer {
+      background-color: #1e293b;
+      color: white;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 引入布局页的导航栏 -->
+<div th:replace="~{layout :: navbar}"></div>
+
+<!-- 主要内容 -->
+<main class="container py-5">
+  <div class="card-container">
+    <!-- 标题区域 -->
+    <div class="header-bg">
+      <h1 class="d-flex align-items-center">
+        <i class="fa fa-plus-circle me-3"></i> 发布新职位
+      </h1>
+      <p class="mt-2" style="opacity: 0.9">填写以下信息，发布您的招聘需求</p>
+    </div>
+
+    <!-- 表单区域 -->
+    <form id="jobPostForm" method="POST" action="/api/company/jobs" class="form-section">
+      <!-- 隐藏字段 -->
+      <input type="hidden" name="companyUserId" value="123456"> <!-- 实际应用中应从会话中获取 -->
+
+      <!-- 基本信息 -->
+      <div class="mb-5">
+        <h2 class="section-title">基本信息</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="title" class="form-label">职位名称 <span class="text-danger">*</span></label>
+            <input type="text" id="title" name="title" class="form-control form-control-lg" placeholder="例如：前端开发工程师" required>
+          </div>
+          <div class="col-md-6">
+            <label for="jobType" class="form-label">职位类型 <span class="text-danger">*</span></label>
+            <select id="jobType" name="jobType" class="form-select form-select-lg" required>
+              <option value="">请选择</option>
+              <option value="FULL_TIME">全职</option>
+              <option value="PART_TIME">兼职</option>
+              <option value="INTERNSHIP">实习</option>
+              <option value="REMOTE">远程</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="location" class="form-label">工作地点 <span class="text-danger">*</span></label>
+            <input type="text" id="location" name="location" class="form-control form-control-lg" placeholder="例如：北京市朝阳区" required>
+          </div>
+          <div class="col-md-6">
+            <label for="salaryRange" class="form-label">薪资范围 <span class="text-danger">*</span></label>
+            <input type="text" id="salaryRange" name="salaryRange" class="form-control form-control-lg" placeholder="例如：8000-12000元/月" required>
+          </div>
+          <div class="col-md-6">
+            <label for="experienceRequirement" class="form-label">工作经验 <span class="text-danger">*</span></label>
+            <select id="experienceRequirement" name="experienceRequirement" class="form-select form-select-lg" required>
+              <option value="">请选择</option>
+              <option value="不限">不限</option>
+              <option value="应届毕业生">应届毕业生</option>
+              <option value="1年以内">1年以内</option>
+              <option value="1-3年">1-3年</option>
+              <option value="3-5年">3-5年</option>
+              <option value="5-10年">5-10年</option>
+              <option value="10年以上">10年以上</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label for="educationRequirement" class="form-label">学历要求 <span class="text-danger">*</span></label>
+            <select id="educationRequirement" name="educationRequirement" class="form-select form-select-lg" required>
+              <option value="">请选择</option>
+              <option value="不限">不限</option>
+              <option value="高中">高中</option>
+              <option value="大专">大专</option>
+              <option value="本科">本科</option>
+              <option value="硕士">硕士</option>
+              <option value="博士">博士</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- 职位描述 -->
+      <div class="mb-5">
+        <h2 class="section-title">职位描述</h2>
+        <div>
+          <label for="description" class="form-label">职位职责与要求 <span class="text-danger">*</span></label>
+          <textarea id="description" name="description" rows="8" class="form-control" placeholder="请详细描述该职位的主要职责、任职要求等信息..." required></textarea>
+        </div>
+      </div>
+
+      <!-- 其他信息 -->
+      <div class="mb-5">
+        <h2 class="section-title">其他信息</h2>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label for="riskLevel" class="form-label">风险等级</label>
+            <select id="riskLevel" name="riskLevel" class="form-select form-select-lg">
+              <option value="LOW">低</option>
+              <option value="MEDIUM">中</option>
+              <option value="HIGH">高</option>
+            </select>
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <input type="checkbox" id="wageGuarantee" name="wageGuarantee" class="form-check-input me-2" style="width: 1.25rem; height: 1.25rem;">
+            <label for="wageGuarantee" class="form-check-label">提供工资保障计划</label>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <label for="benefits" class="form-label">福利待遇</label>
+          <div class="d-flex flex-wrap mb-3" id="benefitsContainer">
+            <span class="benefit-tag">
+              五险一金
+              <button type="button" class="btn btn-link p-0 ms-1 text-primary">
+                <i class="fa fa-times-circle"></i>
+              </button>
+            </span>
+            <span class="benefit-tag">
+              带薪年假
+              <button type="button" class="btn btn-link p-0 ms-1 text-primary">
+                <i class="fa fa-times-circle"></i>
+              </button>
+            </span>
+            <span class="benefit-tag">
+              节日福利
+              <button type="button" class="btn btn-link p-0 ms-1 text-primary">
+                <i class="fa fa-times-circle"></i>
+              </button>
+            </span>
+          </div>
+          <div class="input-group">
+            <input type="text" id="benefitsInput" class="form-control" placeholder="输入福利，按回车添加">
+            <button type="button" id="addBenefitBtn" class="btn btn-primary">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+          <input type="hidden" id="benefits" name="benefits" value='["五险一金","带薪年假","节日福利"]'>
+        </div>
+      </div>
+
+      <!-- 提交按钮 -->
+      <div class="submit-buttons">
+        <button type="button" class="btn btn-outline-secondary">
+          <i class="fa fa-save me-1"></i> 保存草稿
+        </button>
+        <button type="submit" class="btn btn-gradient">
+          <i class="fa fa-check-circle me-1"></i> 发布职位
+        </button>
+      </div>
+    </form>
+  </div>
+</main>
+
+<!-- 页脚 -->
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-3 mb-4">
+        <h3 class="h5 mb-3">甄企宝</h3>
+        <p class="text-white-50">专注于为企业提供高质量的人才招聘服务</p>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h3 class="h5 mb-3">联系我们</h3>
+        <ul class="list-unstyled text-white-50">
+          <li class="mb-2"><i class="fa fa-envelope-o me-2"></i> contact@zhenqibao.com</li>
+          <li class="mb-2"><i class="fa fa-phone me-2"></i> 400-123-4567</li>
+          <li><i class="fa fa-map-marker me-2"></i> 北京市朝阳区科技园A座</li>
+        </ul>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h3 class="h5 mb-3">快速链接</h3>
+        <ul class="list-unstyled">
+          <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">首页</a></li>
+          <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">发布职位</a></li>
+          <li class="mb-2"><a href="#" class="text-white-50 text-decoration-none">企业中心</a></li>
+          <li><a href="#" class="text-white-50 text-decoration-none">帮助中心</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3 mb-4">
+        <h3 class="h5 mb-3">关注我们</h3>
+        <div class="d-flex gap-3">
+          <a href="#" class="text-white-50 fs-5"><i class="fa fa-weixin"></i></a>
+          <a href="#" class="text-white-50 fs-5"><i class="fa fa-weibo"></i></a>
+          <a href="#" class="text-white-50 fs-5"><i class="fa fa-linkedin"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="border-top border-gray-800 mt-4 pt-4 text-center text-white-50">
+      <p>© 2025 甄企宝. 保留所有权利.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- 成功提示框 -->
+<div id="successToast" class="toast-success">
+  <i class="fa fa-check-circle me-2 fs-5"></i>
+  <span>职位发布成功！</span>
+</div>
+
+<script>
+  // 保留原有的所有JavaScript逻辑
+  document.getElementById('jobPostForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> 提交中...';
+
+    // 收集表单数据
+    const formData = {
+      title: document.getElementById('title').value,
+      jobType: document.getElementById('jobType').value,
+      location: document.getElementById('location').value,
+      salaryRange: document.getElementById('salaryRange').value,
+      experienceRequirement: document.getElementById('experienceRequirement').value,
+      educationRequirement: document.getElementById('educationRequirement').value,
+      description: document.getElementById('description').value,
+      riskLevel: document.getElementById('riskLevel').value,
+      wageGuarantee: document.getElementById('wageGuarantee').checked,
+      benefits: JSON.parse(document.getElementById('benefits').value),
+    };
+
+    // 发送请求
+    fetch('/api/company/jobs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    })
+            .then((response) => {
+              if (response.ok) {
+                // 显示成功提示
+                const successToast = document.getElementById('successToast');
+                successToast.classList.add('toast-show');
+
+                // 3秒后隐藏提示并跳转到指定页面
+                setTimeout(() => {
+                  successToast.classList.remove('toast-show');
+                  // 跳转到指定页面
+                  window.location.href = '/company/auth';
+                }, 3000);
+              } else {
+                return response.text().then((text) => {
+                  throw new Error(text || '发布失败');
+                });
+              }
+            })
+            .catch((error) => {
+              alert('发布职位失败: ' + error.message);
+            })
+            .finally(() => {
+              submitBtn.disabled = false;
+              submitBtn.innerHTML = originalText;
+            });
+  });
+
+  // 福利待遇添加功能
+  const benefitsInput = document.getElementById('benefitsInput');
+  const addBenefitBtn = document.getElementById('addBenefitBtn');
+  const benefitsContainer = document.getElementById('benefitsContainer');
+  const benefitsHiddenInput = document.getElementById('benefits');
+
+  function addBenefit(benefitText) {
+    if (!benefitText.trim()) return;
+
+    // 创建福利标签
+    const benefitTag = document.createElement('span');
+    benefitTag.className = 'benefit-tag';
+    benefitTag.innerHTML = `
+      ${benefitText}
+      <button type="button" class="btn btn-link p-0 ms-1 text-primary remove-benefit">
+        <i class="fa fa-times-circle"></i>
+      </button>
+    `;
+
+    // 添加到容器
+    benefitsContainer.appendChild(benefitTag);
+
+    // 更新隐藏字段
+    updateBenefitsHiddenInput();
+
+    // 添加删除事件
+    benefitTag.querySelector('.remove-benefit').addEventListener('click', function () {
+      benefitTag.remove();
+      updateBenefitsHiddenInput();
+    });
+
+    // 清空输入框
+    benefitsInput.value = '';
+  }
+
+  function updateBenefitsHiddenInput() {
+    const benefits = Array.from(benefitsContainer.querySelectorAll('span')).map((tag) =>
+            tag.textContent.trim().replace('×', '').trim()
+    );
+    benefitsHiddenInput.value = JSON.stringify(benefits);
+  }
+
+  // 添加福利事件
+  if (addBenefitBtn && benefitsInput) {
+    addBenefitBtn.addEventListener('click', function () {
+      addBenefit(benefitsInput.value);
+    });
+
+    benefitsInput.addEventListener('keypress', function (e) {
+      if (e.key === 'Enter') {
+        addBenefit(benefitsInput.value);
+      }
+    });
+  }
+</script>
+</body>
+</html>

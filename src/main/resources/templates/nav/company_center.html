@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>企业中心 - 校园招聘系统</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #6c7ff2;
+      --secondary: #3f37c9;
+      --success: #4cc9f0;
+      --info: #4895ef;
+      --warning: #f72585;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --card-bg: #ffffff;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --border-radius: 16px;
+      --header-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    }
+
+    body {
+      background: #f5f8ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #3c4b64;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+
+    .enterprise-header {
+      background: var(--header-gradient);
+      color: white;
+      padding: 30px 0;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .enterprise-header::before {
+      content: '';
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .enterprise-header::after {
+      content: '';
+      position: absolute;
+      bottom: -80px;
+      left: -40px;
+      width: 250px;
+      height: 250px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .company-info-card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      position: relative;
+      z-index: 2;
+    }
+
+    .stats-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      height: 100%;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stats-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .stats-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .stats-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stats-label {
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .jobs-table-container {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 30px;
+    }
+
+    .table-header {
+      background-color: #f9fbfd;
+    }
+
+    .table th {
+      font-weight: 600;
+      color: #495057;
+      padding: 15px 20px;
+    }
+
+    .table td {
+      padding: 15px 20px;
+      vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+      background-color: rgba(67, 97, 238, 0.03);
+    }
+
+    .job-type-badge {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .badge {
+      font-weight: 500;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .badge-low-risk {
+      background: rgba(40, 167, 69, 0.15);
+      color: #28a745;
+    }
+
+    .badge-medium-risk {
+      background: rgba(255, 193, 7, 0.15);
+      color: #e6a000;
+    }
+
+    .badge-high-risk {
+      background: rgba(220, 53, 69, 0.15);
+      color: #dc3545;
+    }
+
+    .btn-action {
+      min-width: 80px;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
+    .pagination-container {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 0;
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      color: #dee2e6;
+      margin-bottom: 20px;
+    }
+
+    .company-logo {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: var(--primary);
+      margin-right: 20px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .company-name {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .company-info {
+      font-size: 1rem;
+      opacity: 0.9;
+      margin-bottom: 0;
+    }
+
+    .stats-row {
+      margin-bottom: 30px;
+    }
+
+    .action-buttons .btn {
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 768px) {
+      .company-info-container {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .company-logo {
+        margin: 0 auto 15px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .section-header .btn {
+        margin-top: 15px;
+        align-self: flex-end;
+      }
+
+      .action-buttons {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .action-buttons .btn {
+        margin-right: 0;
+        margin-bottom: 8px;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- 企业头部区域 -->
+<div class="enterprise-header">
+  <div class="dashboard-container">
+    <div class="d-flex flex-wrap align-items-center company-info-container">
+      <div class="company-logo">
+        <i class="bi bi-building"></i>
+      </div>
+      <div>
+        <h1 class="company-name">创新科技有限公司</h1>
+        <p class="company-info">互联网/电子商务 | 500-1000人 | 已认证企业</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="dashboard-container">
+  <!-- 数据统计卡片 -->
+  <div class="row stats-row">
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="stats-card">
+        <div class="stats-icon" style="background: rgba(67, 97, 238, 0.1); color: var(--primary);">
+          <i class="bi bi-briefcase"></i>
+        </div>
+        <div class="stats-value" th:text="${pageResult.totalItems}">0</div>
+        <div class="stats-label">总职位数</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="stats-card">
+        <div class="stats-icon" style="background: rgba(76, 201, 240, 0.1); color: var(--success);">
+          <i class="bi bi-eye"></i>
+        </div>
+        <div class="stats-value">1,248</div>
+        <div class="stats-label">今日浏览</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="stats-card">
+        <div class="stats-icon" style="background: rgba(247, 37, 133, 0.1); color: var(--warning);">
+          <i class="bi bi-people"></i>
+        </div>
+        <div class="stats-value">42</div>
+        <div class="stats-label">新候选人</div>
+      </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-4">
+      <div class="stats-card">
+        <div class="stats-icon" style="background: rgba(72, 149, 239, 0.1); color: var(--info);">
+          <i class="bi bi-chat-dots"></i>
+        </div>
+        <div class="stats-value">18</div>
+        <div class="stats-label">未读消息</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 职位管理区域 -->
+  <div class="jobs-table-container">
+    <div class="section-header">
+      <h2 class="section-title">职位管理</h2>
+      <a href="/path/to/post-job" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> 发布新职位
+      </a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-hover">
+        <thead class="table-header">
+        <tr>
+          <th>职位名称</th>
+          <th>类型</th>
+          <th>薪资范围</th>
+          <th>工作地点</th>
+          <th>风险等级</th>
+          <th>创建时间</th>
+          <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 空状态 -->
+        <tr th:if="${#lists.isEmpty(pageResult.items)}">
+          <td colspan="7">
+            <div class="empty-state">
+              <i class="bi bi-inbox"></i>
+              <h4 class="mb-3">暂无职位信息</h4>
+              <p class="text-muted mb-4">您还没有发布任何职位，点击下方按钮创建您的第一个职位</p>
+              <a href="/company/jobs/new" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> 发布新职位
+              </a>
+            </div>
+          </td>
+        </tr>
+
+        <!-- 职位列表 -->
+        <tr th:each="job : ${pageResult.items}">
+          <td th:text="${job.title}">职位名称</td>
+          <td>
+                <span class="job-type-badge" th:text="${job.jobType}">
+                  全职
+                </span>
+          </td>
+          <td th:text="${job.salaryRange} ?: '-'">薪资范围</td>
+          <td th:text="${job.location} ?: '-'">工作地点</td>
+          <td>
+            <!-- 风险等级显示 -->
+            <span th:if="${job.riskLevel == 'LOW'}" class="badge badge-low-risk">低风险</span>
+            <span th:if="${job.riskLevel == 'MEDIUM'}" class="badge badge-medium-risk">中风险</span>
+            <span th:if="${job.riskLevel == 'HIGH'}" class="badge badge-high-risk">高风险</span>
+            <span th:if="${job.riskLevel == null}" class="badge badge-medium-risk">未评估</span>
+          </td>
+          <td th:text="${#temporals.format(job.createdAt, 'yyyy-MM-dd')}">2023-01-01</td>
+          <td class="action-buttons">
+            <a th:href="@{'/company/jobs/edit/' + ${job.jobId}}"
+               class="btn btn-sm btn-outline-primary btn-action">
+              <i class="bi bi-pencil"></i> 编辑
+            </a>
+            <form th:action="@{'/company/jobs/' + ${job.jobId}}" method="post"
+                  style="display: inline-block;"
+                  th:attr="onsubmit='return confirm(\'确定要删除这个职位吗？删除后无法恢复。\')'">
+              <input type="hidden" name="_method" value="delete"/>
+              <button type="submit" class="btn btn-sm btn-outline-danger btn-action">
+                <i class="bi bi-trash"></i> 删除
+              </button>
+            </form>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 分页控件 -->
+    <div class="pagination-container" th:if="${pageResult.totalPages > 1}">
+      <nav>
+        <ul class="pagination mb-0">
+          <!-- 第一页 -->
+          <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/company/jobs(page=1, size=${pageSize})}">
+              <i class="bi bi-chevron-double-left"></i>
+            </a>
+          </li>
+
+          <!-- 上一页 -->
+          <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link" th:href="@{/company/jobs(page=${currentPage - 1}, size=${pageSize})}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+
+          <!-- 页码 -->
+          <li th:each="page : ${#numbers.sequence(1, pageResult.totalPages)}"
+              class="page-item" th:classappend="${currentPage == page} ? 'active'">
+            <a class="page-link" th:href="@{/company/jobs(page=${page}, size=${pageSize})}"
+               th:text="${page}">1</a>
+          </li>
+
+          <!-- 下一页 -->
+          <li class="page-item" th:classappend="${currentPage == pageResult.totalPages} ? 'disabled'">
+            <a class="page-link" th:href="@{/company/jobs(page=${currentPage + 1}, size=${pageSize})}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+
+          <!-- 最后一页 -->
+          <li class="page-item" th:classappend="${currentPage == pageResult.totalPages} ? 'disabled'">
+            <a class="page-link" th:href="@{/company/jobs(page=${pageResult.totalPages}, size=${pageSize})}">
+              <i class="bi bi-chevron-double-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

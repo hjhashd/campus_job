@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>求职系统 - 甄企宝</title>
+
+  <!-- 引入共享样式 -->
+  <!-- 已将 cdn.jsdelivr.net 和 cdnjs.cloudflare.com 更换为国内访问更快的 cdn.bootcdn.net -->
+  <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* 从layout.html复制的样式 */
+    :root {
+      --primary: #2563eb;
+      --secondary: #475569;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --gradient: linear-gradient(135deg, #2563eb, #4f46e5);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background: rgba(255, 255, 255, 0.95);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 0.8rem 1rem;
+    }
+
+    .hero-section {
+      background: var(--gradient);
+      color: white;
+      padding: 5rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-section::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(30deg);
+    }
+
+    .feature-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin: 0 auto 1.5rem;
+      font-size: 1.8rem;
+      background: var(--gradient);
+      color: white;
+    }
+
+    .job-card {
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+
+    .job-card:hover {
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      transform: translateY(-5px);
+    }
+
+    .company-logo {
+      width: 60px;
+      height: 60px;
+      border-radius: 10px;
+      object-fit: cover;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+
+    .badge-custom {
+      padding: 0.5em 0.8em;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .risk-low {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+    }
+
+    .risk-medium {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .risk-high {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .testimonial-card {
+      border-radius: 15px;
+      overflow: hidden;
+      height: 100%;
+      position: relative;
+    }
+
+    .testimonial-card::before {
+      content: "" "";
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 5rem;
+      color: rgba(37, 99, 235, 0.1);
+      font-family: Georgia, serif;
+      line-height: 1;
+    }
+
+    .stats-section {
+      background: var(--gradient);
+      color: white;
+      padding: 4rem 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stats-section::before {
+      content: "" "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 1.5rem;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .footer {
+      background: var(--dark);
+      color: white;
+      padding: 4rem 0 2rem;
+    }
+
+    .footer a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .footer a:hover {
+      color: white;
+    }
+
+    .social-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      margin-right: 0.5rem;
+      transition: all 0.3s;
+    }
+
+    .social-icon:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    .auth-buttons .btn {
+      min-width: 100px;
+      margin-left: 0.5rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+
+    .section-title {
+      position: relative;
+      padding-bottom: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .section-title::after {
+      content: "" "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .section-title.text-center::after {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .how-it-works {
+      counter-reset: step-counter;
+    }
+
+    .step-card {
+      position: relative;
+      padding-left: 90px;
+      min-height: 80px;
+      margin-bottom: 2rem;
+    }
+
+    .step-card::before {
+      counter-increment: step-counter;
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 60px;
+      height: 60px;
+      background: var(--gradient);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+
+    .how-it-works-section {
+      background-color: #f1f5f9;
+      padding: 5rem 0;
+    }
+
+    .testimonials-section {
+      padding: 5rem 0;
+    }
+
+    .testimonial-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 1.5rem;
+      border: 3px solid var(--primary);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .hero-section {
+        padding: 3rem 0;
+      }
+
+      .hero-text {
+        text-align: center;
+      }
+
+      .hero-buttons {
+        justify-content: center;
+      }
+
+      .section-title.text-center::after {
+        width: 40px;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+<!-- 引入布局页的导航栏 -->
+<div th:replace="~{layout :: navbar}"></div>
+
+<!-- 英雄区域 -->
+<section class="hero-section">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 hero-text">
+        <h1 class="display-4 fw-bold mb-3">找到理想工作，远离求职陷阱</h1>
+        <p class="lead mb-4">甄企宝求职平台，专注于为学生提供安全可靠的求职环境，企业认证保障，法律援助支持，让您的职业生涯无忧启航。</p>
+        <div class="d-flex flex-wrap hero-buttons position-relative" style="z-index: 10;">
+          <a href="/nav/search"
+             class="btn btn-light btn-lg rounded-pill px-4 py-2 me-3 mb-3 position-relative"
+             style="z-index: 20;">
+            <i class="fas fa-search me-2"></i>浏览职位
+          </a>
+          <a href="/company/auth" class="btn btn-outline-light btn-lg rounded-pill px-4 py-2 mb-3">
+            <i class="fas fa-building me-2"></i>企业认证
+          </a>
+        </div>
+      </div>
+      <div class="col-lg-6 d-none d-lg-block">
+        <div class="position-relative">
+          <div class="position-absolute top-0 start-0 bg-white p-3 rounded shadow" style="width: 200px; transform: rotate(-5deg);">
+            <div class="d-flex align-items-center mb-2">
+              <div class="company-logo me-2">
+                <i class="fas fa-building"></i>
+              </div>
+              <div>
+                <h6 class="mb-0">认证企业</h6>
+                <small class="text-success">信用评分: 92</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between small">
+              <span>薪资保障</span>
+              <i class="fas fa-check-circle text-success"></i>
+            </div>
+          </div>
+
+          <div class="position-absolute top-50 end-0 bg-white p-3 rounded shadow" style="width: 220px; transform: rotate(3deg);">
+            <div class="d-flex align-items-center mb-2">
+              <div class="company-logo me-2">
+                <i class="fas fa-graduation-cap"></i>
+              </div>
+              <div>
+                <h6 class="mb-0">学生反馈</h6>
+                <div>
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star text-warning"></i>
+                  <i class="fas fa-star text-warning"></i>
+                </div>
+              </div>
+            </div>
+            <p class="mb-0 small">"工资准时发放，工作环境优越"</p>
+          </div>
+
+          <div class="position-absolute bottom-0 start-50 translate-middle-x bg-white p-3 rounded shadow" style="width: 200px; transform: rotate(2deg);">
+            <div class="d-flex align-items-center mb-2">
+              <div class="company-logo me-2">
+                <i class="fas fa-balance-scale"></i>
+              </div>
+              <div>
+                <h6 class="mb-0">法律援助</h6>
+                <small class="text-success">成功率98%</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between small">
+              <span>合同保障</span>
+              <i class="fas fa-check-circle text-success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 特色功能 -->
+<section class="py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title d-inline-block text-center">平台特色</h2>
+      <p class="text-muted">甄企宝三大核心功能，全方位保障您的求职安全</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card card shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <h4 class="card-title">企业认证</h4>
+            <p class="card-text text-muted">严格审核企业资质，验证营业执照和税务登记证，确保企业真实可靠。</p>
+            <a href="#" class="btn btn-outline-primary mt-2">了解更多</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-card card shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div class="feature-icon">
+              <i class="fas fa-balance-scale"></i>
+            </div>
+            <h4 class="card-title">法律援助</h4>
+            <p class="card-text text-muted">专业律师团队，提供薪资拖欠、合同纠纷等法律援助，维护您的权益。</p>
+            <a href="#" class="btn btn-outline-primary mt-2">了解更多</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="feature-card card shadow-sm">
+          <div class="card-body p-4 text-center">
+            <div class="feature-icon">
+              <i class="fas fa-star"></i>
+            </div>
+            <h4 class="card-title">职位评价</h4>
+            <p class="card-text text-muted">真实员工评价，了解公司环境、薪资发放情况，选择最合适的工作。</p>
+            <a href="#" class="btn btn-outline-primary mt-2">了解更多</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 最新职位 -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h2 class="section-title">最新职位</h2>
+      <a href="#" class="btn btn-outline-primary">查看所有职位 <i class="fas fa-arrow-right ms-2"></i></a>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="job-card card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">前端开发工程师</h5>
+                <p class="mb-1 text-muted">科技先锋有限公司</p>
+              </div>
+              <div class="company-logo">
+                <i class="fas fa-laptop-code"></i>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap mb-3">
+                                <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-map-marker-alt me-1"></i> 北京
+                                </span>
+              <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-dollar-sign me-1"></i> 15K-25K
+                                </span>
+              <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-briefcase me-1"></i> 全职
+                                </span>
+            </div>
+
+            <p class="card-text text-muted small mb-3">负责公司产品的前端开发，使用Vue.js框架，要求3年以上相关经验...</p>
+
+            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge badge-custom risk-low">
+                                    <i class="fas fa-shield-alt me-1"></i> 低风险
+                                </span>
+              <span class="badge badge-custom bg-primary">
+                                    <i class="fas fa-check-circle me-1"></i> 薪资保障
+                                </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="job-card card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">产品经理</h5>
+                <p class="mb-1 text-muted">创新未来科技有限公司</p>
+              </div>
+              <div class="company-logo">
+                <i class="fas fa-chart-line"></i>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap mb-3">
+                                <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-map-marker-alt me-1"></i> 上海
+                                </span>
+              <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-dollar-sign me-1"></i> 20K-35K
+                                </span>
+              <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-briefcase me-1"></i> 全职
+                                </span>
+            </div>
+
+            <p class="card-text text-muted small mb-3">负责公司核心产品的规划与设计，要求5年以上互联网产品经验...</p>
+
+            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge badge-custom risk-medium">
+                                    <i class="fas fa-shield-alt me-1"></i> 中风险
+                                </span>
+              <span class="badge badge-custom bg-primary">
+                                    <i class="fas fa-check-circle me-1"></i> 薪资保障
+                                </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="job-card card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <div>
+                <h5 class="card-title mb-1">UI/UX设计师</h5>
+                <p class="mb-1 text-muted">创意视觉设计公司</p>
+              </div>
+              <div class="company-logo">
+                <i class="fas fa-paint-brush"></i>
+              </div>
+            </div>
+
+            <div class="d-flex flex-wrap mb-3">
+                                <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-map-marker-alt me-1"></i> 深圳
+                                </span>
+              <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-dollar-sign me-1"></i> 12K-20K
+                                </span>
+              <span class="badge bg-light text-dark me-2 mb-2">
+                                    <i class="fas fa-briefcase me-1"></i> 全职
+                                </span>
+            </div>
+
+            <p class="card-text text-muted small mb-3">负责产品界面设计与用户体验优化，要求精通Figma等设计工具...</p>
+
+            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge badge-custom risk-low">
+                                    <i class="fas fa-shield-alt me-1"></i> 低风险
+                                </span>
+              <span class="badge badge-custom bg-primary">
+                                    <i class="fas fa-check-circle me-1"></i> 薪资保障
+                                </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 工作流程 -->
+<section class="how-it-works-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title d-inline-block text-center">如何使用甄企宝</h2>
+      <p class="text-muted">简单四步，开启安全求职之旅</p>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="step-card">
+          <h4>创建账户</h4>
+          <p class="text-muted">注册学生或企业账户，完善个人信息或企业资质。</p>
+        </div>
+
+        <div class="step-card">
+          <h4>搜索职位/人才</h4>
+          <p class="text-muted">学生可浏览认证企业发布的职位，企业可搜索匹配人才。</p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="step-card">
+          <h4>申请/发布职位</h4>
+          <p class="text-muted">学生可投递简历申请职位，企业可发布认证职位。</p>
+        </div>
+
+        <div class="step-card">
+          <h4>面试与签约</h4>
+          <p class="text-muted">达成意向后进行面试，签约享受平台保障服务。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 统计数据 -->
+<section class="stats-section">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-number">15,000+</div>
+        <div class="stat-label">认证企业</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">320,000+</div>
+        <div class="stat-label">注册用户</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">98%</div>
+        <div class="stat-label">薪资保障率</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">4.8/5.0</div>
+        <div class="stat-label">用户满意度</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 用户评价 -->
+<section class="testimonials-section">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h2 class="section-title d-inline-block text-center">用户评价</h2>
+      <p class="text-muted">听听他们怎么说</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="testimonial-card card shadow-sm">
+          <div class="card-body p-4">
+            <!-- 修改为亚洲人物头像 -->
+            <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="用户" class="testimonial-img">
+            <h5 class="card-title text-center">张同学</h5>
+            <p class="text-muted text-center">应届毕业生</p>
+            <p class="card-text text-center">"通过甄企宝找到了第一份工作，企业认证让人放心，工资准时发放，完全没有遇到拖欠问题！"</p>
+            <div class="d-flex justify-content-center mt-3">
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="testimonial-card card shadow-sm">
+          <div class="card-body p-4">
+            <!-- 修改为亚洲人物头像 -->
+            <img src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="用户" class="testimonial-img">
+            <h5 class="card-title text-center">李经理</h5>
+            <p class="text-muted text-center">企业HR</p>
+            <p class="card-text text-center">"在甄企宝发布职位后，收到了很多高质量的简历。平台的企业认证也增强了求职者对我们的信任。"</p>
+            <div class="d-flex justify-content-center mt-3">
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="testimonial-card card shadow-sm">
+          <div class="card-body p-4">
+            <!-- 修改为亚洲人物头像 -->
+            <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80" alt="用户" class="testimonial-img">
+            <h5 class="card-title text-center">王同学</h5>
+            <p class="text-muted text-center">大三实习生</p>
+            <p class="card-text text-center">"之前实习遇到过薪资拖欠，通过甄企宝的法律援助成功维权。现在找工作只看这个平台的认证企业！"</p>
+            <div class="d-flex justify-content-center mt-3">
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+              <i class="fas fa-star text-warning"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- 引入 Bootstrap JS -->
+<!-- 已将 cdn.jsdelivr.net 更换为国内访问更快的 cdn.bootcdn.net -->
+<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+  // 简单的交互效果
+  document.addEventListener('DOMContentLoaded', function() {
+    // 为导航链接添加活动状态
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', function() {
+        navLinks.forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // 滚动时导航栏效果
+    window.addEventListener('scroll', function() {
+      const navbar = document.querySelector('.navbar');
+      if (window.scrollY > 50) {
+        navbar.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+        navbar.style.padding = '0.5rem 1rem';
+      } else {
+        navbar.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
+        navbar.style.padding = '0.8rem 1rem';
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>混合UI库解决方案</title>
+  
+  <!-- 引入 Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <!-- 引入 Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      important: '#tailwind-container',
+      corePlugins: {
+        preflight: false, // 禁用默认样式重置
+      }
+    }
+  </script>
+  
+  <style>
+    /* 全局样式 */
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+      transition: background-color 0.3s;
+    }
+    
+    /* 组件容器 */
+    .ui-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      background: white;
+      transition: all 0.3s;
+    }
+    
+    /* 切换控件 */
+    .ui-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: white;
+      border-radius: 50px;
+      padding: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      display: flex;
+    }
+    
+    .ui-toggle button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .ui-toggle .active {
+      background: #4f46e5;
+      color: white;
+    }
+    
+    /* Bootstrap 容器样式 */
+    #bootstrap-container {
+      --primary-color: #0d6efd;
+      --success-color: #198754;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
+    
+    /* Tailwind 容器样式 */
+    #tailwind-container {
+      --primary-color: #4f46e5;
+      --success-color: #10b981;
+      --warning-color: #f59e0b;
+      --danger-color: #ef4444;
+    }
+    
+    /* 隔离 Bootstrap 样式 */
+    #bootstrap-container {
+      /* 覆盖 Tailwind 在容器内的样式 */
+      button, input, .btn, .form-control {
+        all: unset;
+      }
+    }
+    
+    /* 隔离 Tailwind 样式 */
+    #tailwind-container {
+      /* 覆盖 Bootstrap 在容器内的样式 */
+      .btn, .form-control {
+        all: unset;
+      }
+    }
+    
+    /* 自定义组件样式 */
+    .custom-component {
+      margin: 30px 0;
+      padding: 25px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #f9fafb;
+    }
+    
+    .component-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid;
+    }
+    
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .ui-toggle {
+        top: 10px;
+        right: 10px;
+      }
+      .ui-toggle button {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- UI库切换控件 -->
+  <div class="ui-toggle">
+    <button id="bootstrap-toggle" class="active">Bootstrap</button>
+    <button id="tailwind-toggle">Tailwind CSS</button>
+  </div>
+
+  <!-- 主容器 -->
+  <div class="ui-container">
+    <h1 class="text-3xl font-bold mb-6 text-center">混合UI库解决方案</h1>
+    <p class="text-center text-gray-600 mb-10">此页面展示了如何在同一项目中混合使用Bootstrap和Tailwind CSS</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Bootstrap组件容器 -->
+      <div id="bootstrap-container" class="custom-component">
+        <h2 class="component-title" style="border-color: var(--primary-color); color: var(--primary-color);">
+          Bootstrap 组件
+        </h2>
+        
+        <div class="mb-4">
+          <button class="btn btn-primary me-2">主要按钮</button>
+          <button class="btn btn-success me-2">成功按钮</button>
+          <button class="btn btn-warning me-2">警告按钮</button>
+          <button class="btn btn-danger">危险按钮</button>
+        </div>
+        
+        <div class="alert alert-primary mt-4">
+          这是一个Bootstrap警告框 - 使用Bootstrap样式
+        </div>
+        
+        <div class="form-group mt-4">
+          <label class="form-label">输入框示例</label>
+          <input type="text" class="form-control" placeholder="使用Bootstrap表单控件">
+        </div>
+        
+        <div class="card mt-4">
+          <div class="card-body">
+            <h5 class="card-title">Bootstrap卡片</h5>
+            <p class="card-text">这是一个使用Bootstrap样式的卡片组件。</p>
+            <a href="#" class="btn btn-primary">卡片按钮</a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Tailwind组件容器 -->
+      <div id="tailwind-container" class="custom-component">
+        <h2 class="component-title" style="border-color: var(--primary-color); color: var(--primary-color);">
+          Tailwind CSS 组件
+        </h2>
+        
+        <div class="mb-4">
+          <button class="bg-[var(--primary-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded mr-2">
+            主要按钮
+          </button>
+          <button class="bg-[var(--success-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded mr-2">
+            成功按钮
+          </button>
+          <button class="bg-[var(--warning-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded mr-2">
+            警告按钮
+          </button>
+          <button class="bg-[var(--danger-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded">
+            危险按钮
+          </button>
+        </div>
+        
+        <div class="bg-[var(--primary-color)] bg-opacity-10 border-l-4 border-[var(--primary-color)] text-[var(--primary-color)] p-4 mt-4 rounded">
+          <p>这是一个Tailwind CSS警告框 - 使用Tailwind样式</p>
+        </div>
+        
+        <div class="mt-4">
+          <label class="block text-gray-700 text-sm font-bold mb-2">输入框示例</label>
+          <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                 type="text" placeholder="使用Tailwind表单控件">
+        </div>
+        
+        <div class="max-w-sm rounded overflow-hidden shadow-lg mt-4">
+          <div class="px-6 py-4">
+            <div class="font-bold text-xl mb-2">Tailwind卡片</div>
+            <p class="text-gray-700 text-base">
+              这是一个使用Tailwind CSS样式的卡片组件。
+            </p>
+          </div>
+          <div class="px-6 pt-4 pb-2">
+            <button class="bg-[var(--primary-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded">
+              卡片按钮
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-12 p-6 bg-gray-50 rounded-xl">
+      <h2 class="text-xl font-semibold mb-4">实现说明</h2>
+      <ul class="list-disc pl-6 space-y-2">
+        <li>通过CSS变量统一主题颜色</li>
+        <li>使用ID选择器隔离不同UI库的样式作用域</li>
+        <li>在Tailwind配置中设置<code>important: '#tailwind-container'</code>限制作用范围</li>
+        <li>使用<code>all: unset</code>重置元素在特定容器内的样式</li>
+        <li>通过JavaScript动态切换UI库显示</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // 切换UI库
+    const toggleBootstrap = document.getElementById('bootstrap-toggle');
+    const toggleTailwind = document.getElementById('tailwind-toggle');
+    const bootstrapContainer = document.getElementById('bootstrap-container');
+    const tailwindContainer = document.getElementById('tailwind-container');
+    
+    // 初始化状态
+    let activeUI = 'bootstrap';
+    
+    // 切换函数
+    function setActiveUI(ui) {
+      activeUI = ui;
+      
+      if (ui === 'bootstrap') {
+        toggleBootstrap.classList.add('active');
+        toggleTailwind.classList.remove('active');
+        bootstrapContainer.style.display = 'block';
+        tailwindContainer.style.display = 'none';
+      } else {
+        toggleBootstrap.classList.remove('active');
+        toggleTailwind.classList.add('active');
+        bootstrapContainer.style.display = 'none';
+        tailwindContainer.style.display = 'block';
+      }
+    }
+    
+    // 事件监听
+    toggleBootstrap.addEventListener('click', () => setActiveUI('bootstrap'));
+    toggleTailwind.addEventListener('click', () => setActiveUI('tailwind'));
+    
+    // 初始化显示
+    setActiveUI('bootstrap');
+  </script>
+</body>
+</html>

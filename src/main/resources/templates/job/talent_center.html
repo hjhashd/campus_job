@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人才中心 - 校园招聘系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-light: #6c7ff2;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --border-radius: 16px;
+            --header-gradient: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        body {
+            background: #f5f8ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #3c4b64;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .talent-header {
+            background: var(--header-gradient);
+            color: white;
+            padding: 30px 0;
+            position: relative;
+            overflow: hidden;
+            margin-top: 70px; /* 匹配导航栏高度 */
+        }
+
+        .talent-header::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .talent-header::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            left: -40px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .stats-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            height: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        .stats-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .talent-table-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .table-header {
+            background-color: #f9fbfd;
+        }
+
+        .table th {
+            font-weight: 600;
+            color: #495057;
+            padding: 15px 20px;
+        }
+
+        .table td {
+            padding: 15px 20px;
+            vertical-align: middle;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(67, 97, 238, 0.03);
+        }
+
+        .talent-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e9ecef;
+            background-color: #f8f9fa; /* 默认背景色 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .talent-avatar i {
+            font-size: 1.5rem;
+            color: #6c757d;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .badge-active {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .badge-inactive {
+            background: rgba(108, 117, 125, 0.15);
+            color: #6c757d;
+        }
+
+        .education-badge {
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .filter-card {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 30px;
+        }
+
+        .talent-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .talent-meta {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+
+        @media (max-width: 768px) {
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-header .btn {
+                margin-top: 15px;
+                align-self: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- 引入布局页的导航栏 -->
+<div th:replace="~{layout :: navbar}"></div>
+
+<!-- 人才中心头部区域 -->
+<div class="talent-header">
+    <div class="dashboard-container">
+        <div class="d-flex flex-wrap align-items-center">
+            <div>
+                <h1 class="display-5 fw-bold">人才中心</h1>
+                <p class="lead">发掘优秀校园人才，助力企业发展</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <!-- 数据统计卡片 -->
+    <div class="row stats-row mb-4">
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(67, 97, 238, 0.1); color: var(--primary);">
+                    <i class="bi bi-people"></i>
+                </div>
+                <div class="stats-value" th:text="${pageResult.totalItems}">0</div>
+                <div class="stats-label">人才总数</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(76, 201, 240, 0.1); color: var(--success);">
+                    <i class="bi bi-mortarboard"></i>
+                </div>
+                <div class="stats-value">248</div>
+                <div class="stats-label">硕士及以上</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(247, 37, 133, 0.1); color: var(--warning);">
+                    <i class="bi bi-award"></i>
+                </div>
+                <div class="stats-value">86</div>
+                <div class="stats-label">985/211高校</div>
+            </div>
+        </div>
+        <div class="col-md-3 col-sm-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-icon" style="background: rgba(72, 149, 239, 0.1); color: var(--info);">
+                    <i class="bi bi-star"></i>
+                </div>
+                <div class="stats-value">42</div>
+                <div class="stats-label">高匹配人才</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 筛选区域 -->
+    <div class="filter-card">
+        <form th:action="@{/company/talent/center}" method="get">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label">学历</label>
+                    <select class="form-select" name="education">
+                        <option value="">全部学历</option>
+                        <option th:value="'专科'" th:selected="${education} == '专科'">专科</option>
+                        <option th:value="'本科'" th:selected="${education} == '本科'">本科</option>
+                        <option th:value="'硕士'" th:selected="${education} == '硕士'">硕士</option>
+                        <option th:value="'博士'" th:selected="${education} == '博士'">博士</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">学校</label>
+                    <input type="text" class="form-control" name="school"
+                           placeholder="输入学校名称" th:value="${school}">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">专业</label>
+                    <input type="text" class="form-control" name="major"
+                           placeholder="输入专业名称" th:value="${major}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button class="btn btn-primary w-100">
+                        <i class="bi bi-funnel me-1"></i> 筛选人才
+                    </button>
+                </div>
+            </div>
+            <!-- 隐藏字段保留分页参数 -->
+            <input type="hidden" name="page" th:value="${pageResult.currentPage}">
+            <input type="hidden" name="size" th:value="${pageResult.pageSize}">
+        </form>
+    </div>
+
+    <!-- 人才列表区域 -->
+    <div class="talent-table-container">
+        <div class="section-header">
+            <h2 class="section-title">人才列表</h2>
+            <div class="d-flex">
+                <form th:action="@{/company/talent/center}" method="get" class="d-flex">
+                    <input type="hidden" name="education" th:value="${education}">
+                    <input type="hidden" name="school" th:value="${school}">
+                    <input type="hidden" name="major" th:value="${major}">
+                    <div class="input-group me-2" style="width: 300px;">
+                        <input type="text" class="form-control" name="search"
+                               placeholder="搜索姓名、学校或专业" th:value="${search}">
+                        <button class="btn btn-outline-primary" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-header">
+                <tr>
+                    <th>人才信息</th>
+                    <th>教育背景</th>
+                    <th>联系方式</th>
+                    <th>注册时间</th>
+                    <th>状态</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                <!-- 空状态 -->
+                <tr th:if="${#lists.isEmpty(pageResult.items)}">
+                    <td colspan="6">
+                        <div class="empty-state text-center py-5">
+                            <i class="bi bi-person-x display-4 text-muted mb-3"></i>
+                            <h4 class="mb-3">暂无人才信息</h4>
+                            <p class="text-muted mb-4">当前筛选条件下没有找到匹配的人才</p>
+                            <a th:href="@{/company/talent/center}" class="btn btn-primary">
+                                重置筛选条件
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+
+                <!-- 人才列表 -->
+                <tr th:each="talent : ${pageResult.items}">
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <!-- 默认头像处理 -->
+                            <div class="talent-avatar me-3">
+                                <!-- 检查头像路径是否存在 -->
+                                <th:block th:if="${talent.avatar != null and talent.avatar != ''}">
+                                    <img th:src="@{${talent.avatar}}" alt="头像"
+                                         onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'bi bi-person\'></i>';">
+                                </th:block>
+                                <th:block th:unless="${talent.avatar != null and talent.avatar != ''}">
+                                    <i class="bi bi-person"></i>
+                                </th:block>
+                            </div>
+                            <div>
+                                <div class="talent-name" th:text="${talent.username}">张三</div>
+                                <div class="talent-meta" th:text="${talent.school} ?: '未填写学校'">北京大学</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <span class="education-badge" th:text="${talent.education} ?: '未填写'">本科</span>
+                            <div class="mt-2" th:text="${talent.major} ?: '未填写专业'">计算机科学与技术</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div>
+                            <div th:text="${talent.email}">zhangsan@example.com</div>
+                            <div class="mt-2" th:text="${talent.phone} ?: '未填写电话'">13800138000</div>
+                        </div>
+                    </td>
+                    <td th:text="${#temporals.format(talent.createdAt, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
+                    <td>
+                        <span th:if="${talent.status == 1}" class="badge badge-active">活跃</span>
+                        <span th:if="${talent.status == 0}" class="badge badge-inactive">未激活</span>
+                    </td>
+                    <td>
+                        <a th:href="@{'/company/talent/resume/' + ${talent.userId}}"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i> 查看简历
+                        </a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 分页控件 -->
+        <div class="pagination-container" th:if="${pageResult.totalPages > 1}">
+            <nav>
+                <ul class="pagination mb-0">
+                    <!-- 第一页 -->
+                    <li class="page-item" th:classappend="${pageResult.currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/company/talent/center(page=1, size=${pageResult.pageSize},
+                education=${education}, school=${school}, major=${major}, search=${search})}">
+                            <i class="bi bi-chevron-double-left"></i>
+                        </a>
+                    </li>
+
+                    <!-- 上一页 -->
+                    <li class="page-item" th:classappend="${pageResult.currentPage == 1} ? 'disabled'">
+                        <a class="page-link" th:href="@{/company/talent/center(page=${pageResult.currentPage - 1}, size=${pageResult.pageSize},
+                education=${education}, school=${school}, major=${major}, search=${search})}">
+                            <i class="bi bi-chevron-left"></i>
+                        </a>
+                    </li>
+
+                    <!-- 页码 -->
+                    <li th:each="page : ${#numbers.sequence(1, pageResult.totalPages)}"
+                        class="page-item" th:classappend="${pageResult.currentPage == page} ? 'active'">
+                        <a class="page-link" th:href="@{/company/talent/center(page=${page}, size=${pageResult.pageSize},
+                education=${education}, school=${school}, major=${major}, search=${search})}"
+                           th:text="${page}">1</a>
+                    </li>
+
+                    <!-- 下一页 -->
+                    <li class="page-item" th:classappend="${pageResult.currentPage == pageResult.totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/company/talent/center(page=${pageResult.currentPage + 1}, size=${pageResult.pageSize},
+                education=${education}, school=${school}, major=${major}, search=${search})}">
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+
+                    <!-- 最后一页 -->
+                    <li class="page-item" th:classappend="${pageResult.currentPage == pageResult.totalPages} ? 'disabled'">
+                        <a class="page-link" th:href="@{/company/talent/center(page=${pageResult.totalPages}, size=${pageResult.pageSize},
+                education=${education}, school=${school}, major=${major}, search=${search})}">
+                            <i class="bi bi-chevron-double-right"></i>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

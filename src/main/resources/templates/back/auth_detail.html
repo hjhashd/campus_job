@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>认证详情 - 企业认证管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --border-radius: 12px;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #3c4b64;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .back-link {
+            text-decoration: none;
+            font-weight: 500;
+            color: #4361ee;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .back-link:hover {
+            color: #3f37c9;
+            transform: translateX(-3px);
+        }
+
+        .back-link i {
+            transition: transform 0.3s ease;
+        }
+
+        .back-link:hover i {
+            transform: translateX(-5px);
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .page-header h2 {
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 0;
+            position: relative;
+            padding-left: 1rem;
+        }
+
+        .page-header h2::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+
+        .card-detail {
+            background: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card-detail:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header-detail {
+            background: linear-gradient(120deg, #f8fafc, #eef2f7);
+            border-radius: var(--border-radius) var(--border-radius) 0 0 !important;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #eef2f7;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .detail-label {
+            font-weight: 500;
+            color: #6c757d;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-size: 1.05rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .status-badge {
+            font-size: 0.95rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #e6a000;
+        }
+
+        .badge-approved {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .badge-rejected {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+
+        .badge-low-risk {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .badge-medium-risk {
+            background: rgba(255, 193, 7, 0.15);
+            color: #e6a000;
+        }
+
+        .badge-high-risk {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+
+        .progress {
+            border-radius: 50px;
+            height: 10px;
+            background: #e9ecef;
+            width: 120px;
+        }
+
+        .progress-bar {
+            border-radius: 50px;
+        }
+
+        .file-card {
+            border: 1px dashed #dce7f1;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            height: 100%;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .file-card:hover {
+            background: #eef2f7;
+            border-color: #cbd5e0;
+            transform: translateY(-3px);
+        }
+
+        .file-card i {
+            font-size: 3rem;
+            color: #4361ee;
+            margin-bottom: 1rem;
+        }
+
+        .file-card p {
+            color: #4a5568;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            word-break: break-all;
+        }
+
+        .btn-download {
+            background: white;
+            border: 1px solid #dce7f1;
+            color: #4361ee;
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download:hover {
+            background: #4361ee;
+            color: white;
+            border-color: #4361ee;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .btn-approve {
+            background: linear-gradient(120deg, #28a745, #1e7e34);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            color: white;
+            box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+        }
+
+        .btn-reject {
+            background: linear-gradient(120deg, #dc3545, #bd2130);
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            color: white;
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.2);
+        }
+
+        .btn-approve:hover, .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+            color: white;
+        }
+
+        .preview-container {
+            margin-top: 1.5rem;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            overflow: hidden;
+            max-width: 100%;
+            max-height: 400px;
+        }
+
+        .preview-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .file-type-badge {
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            background: rgba(67, 97, 238, 0.1);
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .page-header h2 {
+                padding-left: 0;
+            }
+
+            .page-header h2::before {
+                display: none;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+
+
+        /* 新增图片预览样式 */
+        .image-preview-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            min-height: 200px;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            object-fit: contain;
+            border-radius: 6px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .no-preview {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+        }
+
+        .no-preview i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            color: #adb5bd;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-4">
+    <!-- 页面头部 -->
+    <div class="page-header">
+        <a th:href="@{/admin/auth/list}" class="back-link me-4">
+            <i class="bi bi-arrow-left me-2"></i>返回列表
+        </a>
+        <h2>认证申请详情</h2>
+    </div>
+
+    <!-- 基本信息卡片 -->
+    <div class="card card-detail">
+        <div class="card-header card-header-detail">
+            <h5 class="mb-0"><i class="bi bi-building me-2"></i>企业基本信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="detail-label">企业名称</p>
+                    <p class="detail-value" th:text="${auth.companyName}">公司名称</p>
+
+                    <p class="detail-label">统一社会信用代码</p>
+                    <p class="detail-value" th:text="${auth.creditCode}">1234567890ABCDEF</p>
+
+                    <p class="detail-label">公司规模</p>
+                    <p class="detail-value" th:text="${auth.companySize}">100-500人</p>
+                </div>
+
+                <div class="col-md-6">
+                    <p class="detail-label">联系人</p>
+                    <p class="detail-value" th:text="${auth.contactPerson}">张经理</p>
+
+                    <p class="detail-label">联系电话</p>
+                    <p class="detail-value" th:text="${auth.phone}">13800138000</p>
+
+                    <p class="detail-label">所属行业</p>
+                    <p class="detail-value" th:text="${auth.industry}">互联网/IT</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <p class="detail-label">公司总部</p>
+                    <p class="detail-value" th:text="${auth.headquarters}">北京市海淀区</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <p class="detail-label">公司描述</p>
+                    <div class="bg-light p-3 rounded">
+                        <p class="mb-0" th:text="${auth.companyDescription}">
+                            我们是一家专注于企业级软件开发的科技公司，致力于为企业提供高质量的IT解决方案。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 认证信息卡片 -->
+    <div class="card card-detail">
+        <div class="card-header card-header-detail">
+            <h5 class="mb-0"><i class="bi bi-shield-check me-2"></i>认证信息</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <p class="detail-label">认证状态</p>
+                    <span th:if="${auth.status == 'PENDING'}" class="badge badge-pending status-badge">待处理</span>
+                    <span th:if="${auth.status == 'APPROVED'}" class="badge badge-approved status-badge">已通过</span>
+                    <span th:if="${auth.status == 'REJECTED'}" class="badge badge-rejected status-badge">已拒绝</span>
+                </div>
+
+                <div class="col-md-3">
+                    <p class="detail-label">信用评分</p>
+                    <div class="d-flex align-items-center">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar"
+                                 th:style="'width: ' + ${auth.creditScore} + '%;'"
+                                 th:classappend="${auth.creditScore >= 85} ? 'bg-success' :
+                                                     (${auth.creditScore >= 70} ? 'bg-warning' : 'bg-danger')">
+                            </div>
+                        </div>
+                        <span class="ms-2 fw-bold" th:text="${auth.creditScore}">80</span>
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <p class="detail-label">风险等级</p>
+                    <span th:if="${auth.riskLevel == 'LOW'}" class="badge badge-low-risk status-badge">低风险</span>
+                    <span th:if="${auth.riskLevel == 'MEDIUM'}" class="badge badge-medium-risk status-badge">中风险</span>
+                    <span th:if="${auth.riskLevel == 'HIGH'}" class="badge badge-high-risk status-badge">高风险</span>
+                </div>
+
+                <div class="col-md-3">
+                    <p class="detail-label">最后审核时间</p>
+                    <p class="detail-value" th:text="${#temporals.format(auth.lastAuditTime, 'yyyy-MM-dd HH:mm')}">2023-01-01 10:00</p>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="detail-label">法律案件数量</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-journal-text text-primary"></i>
+                        </div>
+                        <span class="ms-3 fw-bold fs-5" th:text="${auth.legalCaseCount}">2</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <p class="detail-label">工资拖欠次数</p>
+                    <div class="d-flex align-items-center">
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                            <i class="bi bi-cash-coin text-warning"></i>
+                        </div>
+                        <span class="ms-3 fw-bold fs-5" th:text="${auth.wageDelayCount}">0</span>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <p class="detail-label">拒绝原因</p>
+                    <div class="bg-light p-3 rounded">
+                        <p class="mb-0" th:text="${auth.rejectReason != null} ? ${auth.rejectReason} : '无'">无</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 文件信息卡片 - 关键修复部分 -->
+    <div class="card card-detail">
+        <div class="card-header card-header-detail">
+            <h5 class="mb-0"><i class="bi bi-folder-check me-2"></i>认证文件</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- 营业执照 -->
+                <div class="col-md-6 mb-4">
+                    <p class="detail-label">营业执照</p>
+
+                    <div th:if="${auth.businessLicense != null and !auth.businessLicense.isEmpty()}">
+                        <div class="file-card">
+                            <i class="bi bi-file-earmark-image text-primary"></i>
+                            <p class="mb-0" th:text="${auth.businessLicense}">business_license.jpg</p>
+                            <a th:href="@{'/uploads/' + ${auth.businessLicense}}" download
+                               class="btn btn-download mt-3">
+                                <i class="bi bi-download me-1"></i>下载文件
+                            </a>
+                        </div>
+
+                        <!-- 图片预览区域 - 修改后直接展示图片 -->
+                        <div class="preview-container mt-3">
+                            <div class="preview-header">
+                                <span>图片预览</span>
+                                <span class="file-type-badge" th:text="${#strings.substringAfter(auth.businessLicense, '.')}">jpg</span>
+                            </div>
+                            <div class="image-preview-container">
+                                <!-- 核心修改：直接使用img标签显示图片 -->
+                                <img th:src="@{'/uploads/' + ${auth.businessLicense}}"
+                                     alt="营业执照预览"
+                                     class="preview-image"
+                                     onerror="this.onerror=null;this.src='#';this.parentElement.innerHTML='<div class=\'no-preview\'><i class=\'bi bi-file-earmark-excel\'></i><p>无法加载图片</p></div>'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 没有文件时的显示 -->
+                    <div th:if="${auth.businessLicense == null or auth.businessLicense.isEmpty()}" class="no-file">
+                        <i class="bi bi-file-earmark-excel text-secondary" style="font-size: 3rem;"></i>
+                        <p class="mt-2">未上传营业执照</p>
+                    </div>
+                </div>
+
+                <!-- 税务登记证 -->
+                <div class="col-md-6 mb-4">
+                    <p class="detail-label">税务登记证</p>
+
+                    <div th:if="${auth.taxCertificate != null and !auth.taxCertificate.isEmpty()}">
+                        <div class="file-card">
+                            <i class="bi bi-file-earmark-image text-primary"></i>
+                            <p class="mb-0" th:text="${auth.taxCertificate}">tax_certificate.jpg</p>
+                            <a th:href="@{'/uploads/' + ${auth.taxCertificate}}" download
+                               class="btn btn-download mt-3">
+                                <i class="bi bi-download me-1"></i>下载文件
+                            </a>
+                        </div>
+
+                        <!-- 图片预览区域 - 修改后直接展示图片 -->
+                        <div class="preview-container mt-3">
+                            <div class="preview-header">
+                                <span>图片预览</span>
+                                <span class="file-type-badge" th:text="${#strings.substringAfter(auth.taxCertificate, '.')}">jpg</span>
+                            </div>
+                            <div class="image-preview-container">
+                                <!-- 核心修改：直接使用img标签显示图片 -->
+                                <img th:src="@{'/uploads/' + ${auth.taxCertificate}}"
+                                     alt="税务登记证预览"
+                                     class="preview-image"
+                                     onerror="this.onerror=null;this.src='#';this.parentElement.innerHTML='<div class=\'no-preview\'><i class=\'bi bi-file-earmark-excel\'></i><p>无法加载图片</p></div>'">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 没有文件时的显示 -->
+                    <div th:if="${auth.taxCertificate == null or auth.taxCertificate.isEmpty()}" class="no-file">
+                        <i class="bi bi-file-earmark-excel text-secondary" style="font-size: 3rem;"></i>
+                        <p class="mt-2">未上传税务登记证</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons">
+        <!-- 始终显示通过认证按钮 -->
+        <form th:action="@{/admin/auth/{authId}/approve(authId=${auth.authId})}"
+              method="post"
+              style="display: inline;">
+            <button type="submit" class="btn btn-approve">
+                <i class="bi bi-check-lg me-1"></i>通过认证
+            </button>
+        </form>
+
+        <!-- 始终显示拒绝认证按钮 -->
+        <button class="btn btn-reject"
+                data-bs-toggle="modal"
+                data-bs-target="#rejectModal">
+            <i class="bi bi-x-lg me-1"></i>拒绝认证
+        </button>
+    </div>
+
+    <!-- 拒绝模态框 -->
+    <!-- 拒绝模态框（详情页） -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-x-circle me-2"></i>拒绝认证申请</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/admin/auth/{authId}/reject(authId=${auth.authId})}" method="post">
+
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="rejectReason" class="form-label fw-medium">拒绝原因</label>
+                            <textarea class="form-control" id="rejectReason" name="reason" rows="4" required
+                                      placeholder="请详细说明拒绝认证的原因..."></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-danger">确认拒绝</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

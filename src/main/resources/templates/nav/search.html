@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>职位搜索</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c7be5;
+            --secondary-color: #6c757d;
+            --success-color: #00d97e;
+            --warning-color: #f6c343;
+            --danger-color: #e63757;
+            --light-bg: #f9fbfd;
+            --card-border: #e3ebf6;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            padding-top: 60px;  /* 减少顶部内边距 (原80px) */
+        }
+
+        .navbar-container {
+            height: 60px; /* 与padding-top保持一致 */
+        }
+
+        .search-header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0.5rem 1rem rgba(46, 54, 80, 0.1);
+            margin-bottom: 30px;
+        }
+
+        /* 新添加的筛选面板样式 */
+        .filter-panel {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0.35rem 1rem rgba(46, 54, 80, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .filter-group {
+            margin-bottom: 25px;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #343a40;
+            font-size: 15px;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-check {
+            margin-bottom: 8px;
+        }
+
+        .filter-divider {
+            margin: 15px 0;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .applied-filters {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 0.15rem 0.5rem rgba(46, 54, 80, 0.05);
+            border: 1px solid #e9ecef;
+        }
+
+        .filter-tag {
+            display: inline-flex;
+            align-items: center;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .filter-tag .remove {
+            margin-left: 6px;
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .no-results-card {
+            background: white;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 0.35rem 1rem rgba(46, 54, 80, 0.1);
+        }
+
+        .popular-searches {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            box-shadow: 0 0.35rem 1rem rgba(46, 54, 80, 0.1);
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 0.35rem 1rem rgba(46, 54, 80, 0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+
+        .job-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.75rem 1.5rem rgba(46, 54, 80, 0.1);
+        }
+
+        .job-header {
+            border-bottom: 1px solid var(--card-border);
+            padding: 20px;
+        }
+
+        .job-body {
+            padding: 20px;
+        }
+
+        .job-footer {
+            border-top: 1px solid var(--card-border);
+            padding: 15px 20px;
+            background-color: rgba(227, 235, 246, 0.3);
+            border-radius: 0 0 10px 10px;
+        }
+
+        .job-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #2a3547;
+        }
+
+        .company-name {
+            font-size: 0.95rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.5em 0.8em;
+            border-radius: 0.5rem;
+        }
+
+        .salary-range {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--success-color);
+        }
+
+        .detail-btn {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .detail-btn:hover {
+            background-color: #1c67d8;
+            transform: translateY(-2px);
+        }
+
+        .risk-low { background-color: rgba(0, 217, 126, 0.1); color: #00a865; }
+        .risk-medium { background-color: rgba(246, 195, 67, 0.1); color: #d9a60a; }
+        .risk-high { background-color: rgba(230, 55, 87, 0.1); color: #d92550; }
+
+        .credit-score {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(44, 123, 229, 0.1);
+            color: var(--primary-color);
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .rating {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(246, 195, 67, 0.1);
+            color: #d9a60a;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .wage-guarantee {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(0, 217, 126, 0.1);
+            color: #00a865;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .job-meta {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sort-select {
+            width: 150px;
+            display: inline-block;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{layout :: navbar}"></div>
+
+<div class="container pt-1 pb-4">
+    <!-- 搜索栏 -->
+    <div class="search-header">
+        <div class="row g-3">
+            <div class="col-md-8">
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                    <input type="text" class="form-control"
+                           placeholder="搜索职位、公司或关键字..."
+                           id="searchInput">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <button class="btn btn-primary w-100" id="searchBtn">
+                    <i class="fas fa-search me-1"></i> 搜索职位
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 左侧筛选面板 -->
+        <div class="col-lg-3">
+            <div class="filter-panel">
+                <div class="filter-group">
+                    <div class="filter-label">薪资范围</div>
+                    <div class="filter-options">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="salaryFilter" id="salary0-5" value="0-5000">
+                            <label class="form-check-label" for="salary0-5">5K以下</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="salaryFilter" id="salary5-10" value="5000-10000">
+                            <label class="form-check-label" for="salary5-10">5K-10K</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="salaryFilter" id="salary10-15" value="10000-15000">
+                            <label class="form-check-label" for="salary10-15">10K-15K</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="salaryFilter" id="salary15-25" value="15000-25000">
+                            <label class="form-check-label" for="salary15-25">15K-25K</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="salaryFilter" id="salary25plus" value="25000-">
+                            <label class="form-check-label" for="salary25plus">25K以上</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <div class="filter-group">
+                    <div class="filter-label">职位类型</div>
+                    <div class="filter-options">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="jobTypeFulltime" value="全职">
+                            <label class="form-check-label" for="jobTypeFulltime">全职</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="jobTypeParttime" value="兼职">
+                            <label class="form-check-label" for="jobTypeParttime">兼职</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="jobTypeIntern" value="实习">
+                            <label class="form-check-label" for="jobTypeIntern">实习</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="jobTypeRemote" value="远程">
+                            <label class="form-check-label" for="jobTypeRemote">远程</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <div class="filter-group">
+                    <div class="filter-label">企业规模</div>
+                    <div class="filter-options">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="companySizeStartup" value="初创企业">
+                            <label class="form-check-label" for="companySizeStartup">初创企业</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="companySizeSME" value="中小型企业">
+                            <label class="form-check-label" for="companySizeSME">中小型企业</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="companySizeLarge" value="大型企业">
+                            <label class="form-check-label" for="companySizeLarge">大型企业</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="companySizeMultinational" value="跨国集团">
+                            <label class="form-check-label" for="companySizeMultinational">跨国集团</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="filter-divider"></div>
+
+                <div class="filter-group">
+                    <div class="filter-label">企业信用分</div>
+                    <div class="filter-options">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="creditScore" id="credit0-59" value="0-59">
+                            <label class="form-check-label" for="credit0-59">0-59</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="creditScore" id="credit60-69" value="60-69">
+                            <label class="form-check-label" for="credit60-69">60-69</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="creditScore" id="credit70-79" value="70-79">
+                            <label class="form-check-label" for="credit70-79">70-79</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="creditScore" id="credit80plus" value="80-">
+                            <label class="form-check-label" for="credit80plus">80+</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary w-100 mt-3" id="applyFilterBtn">应用筛选</button>
+            </div>
+
+            <!-- 热门搜索 -->
+            <div class="popular-searches">
+                <h6>热门搜索</h6>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="#" class="btn btn-sm btn-outline-secondary">Java开发</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">前端工程师</a>
+                    <a href="#" class="btn btn-sm btn-outline-secondary">产品经理</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧结果区域 -->
+        <div class="col-lg-9">
+            <!-- 当前筛选条件和排序 -->
+            <div class="applied-filters">
+                <div class="results-header">
+                    <h5 class="m-0" id="resultCount">找到0个职位</h5>
+                    <div>
+                        <span>排序:</span>
+                        <select class="form-select sort-select" id="sortBy">
+                            <option value="newest">最新发布</option>
+                            <option value="salary">薪资最高</option>
+                            <option value="credit">信用最佳</option>
+                            <option value="rating">评价最高</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <h6 class="d-inline me-2">当前筛选条件:</h6>
+                    <div id="currentFilters">
+                        <!-- 当前应用的筛选条件标签会动态添加到这里 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 职位列表 -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="jobsContainer">
+                <div class="job-card h-100 d-flex flex-column">
+                    <div class="job-header">
+                        <h5 class="job-title">职位标题</h5>
+                        <div class="company-name">公司名称</div>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <span class="badge bg-primary">职位类型</span>
+                            <span class="badge risk-low">低风险</span>
+                            <span class="wage-guarantee">
+                    <i class="fas fa-shield-alt me-1"></i>工资保障
+                </span>
+                        </div>
+                    </div>
+
+                    <div class="job-body flex-grow-1">
+                        <p class="job-meta">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            工作地点
+                        </p>
+                        <p class="job-meta">
+                            <i class="far fa-clock me-1"></i>
+                            发布于 2023-10-10
+                        </p>
+                        <div class="mt-3">
+                            <p class="text-muted mb-1">职位描述</p>
+                            <p class="job-description" style="font-size: 0.9rem;">
+                                职位描述摘要...
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="job-footer">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="salary-range">薪资范围</div>
+                            <div class="d-flex gap-2">
+                    <span class="credit-score">
+                        <i class="fas fa-star me-1"></i>
+                        信用分
+                    </span>
+                                <span class="rating">
+                        <i class="fas fa-star me-1"></i>
+                        评分 (评价数)
+                    </span>
+                            </div>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <a href="/job/detail/1" class="btn detail-btn">
+                                <i class="fas fa-eye me-1"></i> 查看详情
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 无结果提示 -->
+            <div class="no-results-card" id="noResults" style="display: none;">
+                <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+                <h4 class="mb-2">没有找到匹配的职位</h4>
+                <p class="text-muted">请尝试调整筛选条件或搜索关键词</p>
+                <button class="btn btn-outline-primary mt-3" id="resetFiltersBtn">重置筛选条件</button>
+            </div>
+
+            <!-- 分页控件 -->
+            <div class="d-flex justify-content-center mt-5">
+                <nav>
+                    <ul class="pagination">
+                        <li class="page-item">
+                            <button class="page-link" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+                        </li>
+                        <li class="page-item">
+                            <span class="page-link text-dark" id="currentPage">1</span>
+                        </li>
+                        <li class="page-item">
+                            <button class="page-link" id="nextPage"><i class="fas fa-chevron-right"></i></button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // 搜索DTO对象
+    const searchDTO = {
+        keyword: '',
+        salaryRange: null,
+        jobTypes: [],
+        companySizes: [],
+        creditScore: null,
+        page: 1,
+        pageSize: 6,
+        sortBy: 'newest'
+    };
+
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', function() {
+        // 设置初始排序值
+        document.getElementById('sortBy').value = searchDTO.sortBy;
+
+        // 添加筛选按钮事件
+        document.getElementById('applyFilterBtn').addEventListener('click', function() {
+            searchDTO.page = 1; // 重置页码
+            collectFilters();
+            searchJobs();
+        });
+
+        // 添加搜索按钮事件
+        document.getElementById('searchBtn').addEventListener('click', function() {
+            searchDTO.page = 1; // 重置页码
+            searchDTO.keyword = document.getElementById('searchInput').value.trim();
+            collectFilters();
+            searchJobs();
+        });
+
+        // 添加重置筛选按钮事件
+        document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+            resetFilters();
+            searchJobs();
+        });
+
+        // 排序变化事件
+        document.getElementById('sortBy').addEventListener('change', function() {
+            searchDTO.sortBy = this.value;
+            searchDTO.page = 1; // 重置页码
+            searchJobs();
+        });
+
+        // 分页按钮事件
+        document.getElementById('prevPage').addEventListener('click', function() {
+            if (searchDTO.page > 1) {
+                searchDTO.page--;
+                searchJobs();
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', function() {
+            // 实际页数由后端返回，这里先增加，后端会验证
+            searchDTO.page++;
+            searchJobs();
+        });
+
+        // 初始搜索
+        searchJobs();
+    });
+
+    // 收集筛选条件
+    function collectFilters() {
+        // 收集薪资筛选
+        const salaryRadios = document.querySelectorAll('input[name="salaryFilter"]:checked');
+        searchDTO.salaryRange = salaryRadios.length > 0 ? salaryRadios[0].value : null;
+
+        // 收集职位类型
+        searchDTO.jobTypes = [];
+        document.querySelectorAll('input[id^="jobType"]:checked').forEach(checkbox => {
+            searchDTO.jobTypes.push(checkbox.value);
+        });
+
+        // 收集企业规模
+        searchDTO.companySizes = [];
+        document.querySelectorAll('input[id^="companySize"]:checked').forEach(checkbox => {
+            searchDTO.companySizes.push(checkbox.value);
+        });
+
+        // 收集信用分
+        const creditRadios = document.querySelectorAll('input[name="creditScore"]:checked');
+        searchDTO.creditScore = creditRadios.length > 0 ? creditRadios[0].value : null;
+
+        // 更新筛选标签
+        updateFilterTags();
+    }
+
+    // 更新筛选标签显示
+    function updateFilterTags() {
+        const container = document.getElementById('currentFilters');
+        container.innerHTML = '';
+
+        // 添加薪资标签
+        if (searchDTO.salaryRange) {
+            const salaryMap = {
+                '0-5000': '5K以下',
+                '5000-10000': '5K-10K',
+                '10000-15000': '10K-15K',
+                '15000-25000': '15K-25K',
+                '25000-': '25K以上'
+            };
+            addFilterTag('薪资: ' + salaryMap[searchDTO.salaryRange], 'salary');
+        }
+
+        // 添加职位类型标签
+        if (searchDTO.jobTypes.length > 0) {
+            searchDTO.jobTypes.forEach(type => {
+                addFilterTag('类型: ' + type, 'jobType', type);
+            });
+        }
+
+        // 添加企业规模标签
+        if (searchDTO.companySizes.length > 0) {
+            searchDTO.companySizes.forEach(size => {
+                addFilterTag('规模: ' + size, 'companySize', size);
+            });
+        }
+
+        // 添加信用分标签
+        if (searchDTO.creditScore) {
+            const creditMap = {
+                '0-59': '0-59',
+                '60-69': '60-69',
+                '70-79': '70-79',
+                '80-': '80+'
+            };
+            addFilterTag('信用: ' + creditMap[searchDTO.creditScore], 'credit');
+        }
+
+        // 添加搜索词标签
+        if (searchDTO.keyword) {
+            addFilterTag('搜索: ' + searchDTO.keyword, 'search');
+        }
+
+        // 如果没有筛选条件，显示提示
+        if (container.innerHTML === '') {
+            container.innerHTML = '<span class="text-muted">没有应用筛选条件</span>';
+        }
+    }
+
+    // 添加单个筛选标签
+    function addFilterTag(text, filterType, filterValue) {
+        const tag = document.createElement('span');
+        tag.className = 'filter-tag';
+        tag.innerHTML = text + ' <span class="remove" data-type="' + filterType + '" data-value="' + (filterValue || '') + '">×</span>';
+
+        // 添加点击事件
+        tag.querySelector('.remove').addEventListener('click', function() {
+            const type = this.getAttribute('data-type');
+            const value = this.getAttribute('data-value');
+            removeFilter(type, value);
+        });
+
+        document.getElementById('currentFilters').appendChild(tag);
+    }
+
+    // 移除筛选条件
+    function removeFilter(type, value) {
+        switch(type) {
+            case 'salary':
+                searchDTO.salaryRange = null;
+                document.querySelectorAll('input[name="salaryFilter"]').forEach(radio => radio.checked = false);
+                break;
+            case 'jobType':
+                searchDTO.jobTypes = searchDTO.jobTypes.filter(t => t !== value);
+                document.getElementById('jobType' + value.replace('职', '')).checked = false;
+                break;
+            case 'companySize':
+                searchDTO.companySizes = searchDTO.companySizes.filter(s => s !== value);
+                document.getElementById('companySize' + value.charAt(0)).checked = false;
+                break;
+            case 'credit':
+                searchDTO.creditScore = null;
+                document.querySelectorAll('input[name="creditScore"]').forEach(radio => radio.checked = false);
+                break;
+            case 'search':
+                searchDTO.keyword = '';
+                document.getElementById('searchInput').value = '';
+                break;
+        }
+
+        searchDTO.page = 1;
+        updateFilterTags();
+        searchJobs();
+    }
+
+    // 重置所有筛选条件
+    function resetFilters() {
+        // 重置筛选输入
+        document.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {
+            input.checked = false;
+        });
+
+        // 重置搜索框
+        document.getElementById('searchInput').value = '';
+        searchDTO.keyword = '';
+
+        // 重置DTO对象
+        searchDTO.salaryRange = null;
+        searchDTO.jobTypes = [];
+        searchDTO.companySizes = [];
+        searchDTO.creditScore = null;
+        searchDTO.page = 1;
+        searchDTO.sortBy = 'newest';
+
+        // 重置排序下拉框
+        document.getElementById('sortBy').value = 'newest';
+
+        // 更新UI
+        updateFilterTags();
+    }
+
+    // AJAX搜索职位
+    function searchJobs() {
+        const params = new URLSearchParams();
+
+        // 添加搜索参数
+        if (searchDTO.keyword) params.append('keyword', searchDTO.keyword);
+        if (searchDTO.salaryRange) params.append('salaryRange', searchDTO.salaryRange);
+        // 处理数组参数
+        if (searchDTO.jobTypes && searchDTO.jobTypes.length > 0) {
+            searchDTO.jobTypes.forEach(t => params.append('jobTypes', t));
+        }
+        if (searchDTO.companySizes && searchDTO.companySizes.length > 0) {
+            searchDTO.companySizes.forEach(s => params.append('companySizes', s));
+        }
+        if (searchDTO.creditScore) params.append('creditScore', searchDTO.creditScore);
+        params.append('page', searchDTO.page);
+        params.append('pageSize', searchDTO.pageSize);
+        params.append('sortBy', searchDTO.sortBy);
+
+        // 显示加载状态
+        const jobsContainer = document.getElementById('jobsContainer');
+        jobsContainer.innerHTML = '<div class="col-12 text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
+
+        fetch(`/job/search?${params.toString()}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                renderJobs(data.items);
+
+                // 更新分页信息
+                document.getElementById('resultCount').textContent = `找到${data.totalItems}个职位`;
+                document.getElementById('currentPage').textContent = data.currentPage;
+
+                // 更新分页按钮状态
+                const prevBtn = document.getElementById('prevPage');
+                const nextBtn = document.getElementById('nextPage');
+                prevBtn.disabled = data.currentPage <= 1;
+                nextBtn.disabled = data.currentPage >= data.totalPages;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                jobsContainer.innerHTML = `
+                    <div class="col-12">
+                        <div class="alert alert-danger" role="alert">
+                            加载数据失败，请稍后再试
+                        </div>
+                    </div>
+                `;
+            });
+    }
+
+    // 渲染职位列表
+    function renderJobs(jobs) {
+        const jobsContainer = document.getElementById('jobsContainer');
+
+        if (!jobs || jobs.length === 0) {
+            jobsContainer.innerHTML = '';
+            document.getElementById('noResults').style.display = 'block';
+            return;
+        }
+
+        document.getElementById('noResults').style.display = 'none';
+
+        jobsContainer.innerHTML = jobs.map(job => `
+        <div class="col job-item">
+            <div class="job-card h-100 d-flex flex-column">
+                <div class="job-header">
+                    <h5 class="job-title">${job.title}</h5>
+                    <div class="company-name">${job.companyName}</div>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="badge bg-primary">${job.jobType}</span>
+                        <span class="badge ${getRiskClass(job.riskLevel)}">
+                            ${getRiskText(job.riskLevel)}
+                        </span>
+                        ${job.wageGuarantee ? `
+                            <span class="wage-guarantee">
+                                <i class="fas fa-shield-alt me-1"></i>工资保障
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="job-body flex-grow-1">
+                    <p class="job-meta">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        <span>${job.location || '暂无地点信息'}</span>
+                    </p>
+                    <p class="job-meta">
+                        <i class="far fa-clock me-1"></i>
+                        发布于 <span>${formatDate(job.createdAt)}</span>
+                    </p>
+                    <div class="mt-3">
+                        <p class="text-muted mb-1">职位描述</p>
+                        <p class="job-description" style="font-size: 0.9rem;">
+                            ${abbreviate(job.description || '暂无职位描述', 120)}
+                        </p>
+                    </div>
+                </div>
+
+                <div class="job-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="salary-range">${job.salaryRange || '薪资面议'}</div>
+                        <div class="d-flex gap-2">
+                            ${job.creditScore ? `
+                                <span class="credit-score">
+                                    <i class="fas fa-star me-1"></i>
+                                    <span>${job.creditScore}</span>
+                                </span>
+                            ` : ''}
+                            ${job.reviewCount > 0 ? `
+                                <span class="rating">
+                                    <i class="fas fa-star me-1"></i>
+                                    <span>${job.averageRating?.toFixed(1) || '0.0'}</span>
+                                    (${job.reviewCount})
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="d-grid mt-3">
+                        <a href="/job/detail/${job.jobId}" class="btn detail-btn">
+                            <i class="fas fa-eye me-1"></i> 查看详情
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+    }
+
+    // 辅助函数：日期格式化
+    function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    }
+
+    // 辅助函数：截断字符串
+    function abbreviate(text, maxLength) {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    // 辅助函数：获取风险等级样式
+    function getRiskClass(riskLevel) {
+        switch(riskLevel) {
+            case 'LOW': return 'risk-low';
+            case 'MEDIUM': return 'risk-medium';
+            case 'HIGH': return 'risk-high';
+            default: return '';
+        }
+    }
+
+    // 辅助函数：获取风险等级文本
+    function getRiskText(riskLevel) {
+        if (!riskLevel) return '未知风险';
+
+        switch(riskLevel.toUpperCase()) {
+            case 'LOW': return '低风险';
+            case 'MEDIUM': return '中风险';
+            case 'HIGH': return '高风险';
+            default: return riskLevel;
+        }
+    }
+
+    // 更新分页信息
+    function updatePagination(data) {
+        // 更新总职位数显示
+        document.getElementById('resultCount').textContent = `找到${data.totalItems}个职位`;
+
+        // 更新当前页码（使用后端返回的当前页，避免前端传递的页码超出范围）
+        searchDTO.page = data.currentPage;
+        document.getElementById('currentPage').textContent = data.currentPage;
+
+        // 更新分页按钮状态
+        const prevBtn = document.getElementById('prevPage');
+        const nextBtn = document.getElementById('nextPage');
+
+        prevBtn.disabled = data.currentPage <= 1;
+        nextBtn.disabled = data.currentPage >= data.totalPages;
+    }
+
+    document.querySelectorAll('.dropdown-toggle').forEach(toggle => {
+        new bootstrap.Dropdown(toggle); // 手动初始化所有下拉菜单
+    });
+</script>
+</body>
+</html>

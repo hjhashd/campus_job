@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>甄企宝 - AI求职助手</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --secondary: #475569;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --light: #f8fafc;
+            --dark: #1e293b;
+            --gradient: linear-gradient(135deg, #2563eb, #4f46e5);
+        }
+
+        body {
+            background: var(--gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1100px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+
+        .header {
+            background: var(--gradient);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-content {
+            flex: 1;
+            padding: 0 50px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header p {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(-3px);
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #4CAF50;
+            box-shadow: 0 0 8px #4CAF50;
+        }
+
+        .main-content {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .info-panel {
+            width: 300px;
+            background: #f0f4ff;
+            padding: 20px;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .info-panel h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .feature-content {
+            color: var(--secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-history {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: #f9f9ff;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 15px;
+            position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(to right, var(--primary), #4f46e5);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .message-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .user-message .message-header {
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .ai-message .message-header {
+            color: var(--primary);
+        }
+
+        .message-content {
+            line-height: 1.5;
+        }
+
+        .ai-message .message-content {
+            color: #333;
+        }
+
+        .input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 30px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .message-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .send-button {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 55px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .send-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(74, 0, 224, 0.3);
+        }
+
+        .send-button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 15px;
+            align-self: flex-start;
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 15px;
+            border-bottom-left-radius: 5px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .typing-indicator span {
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(1) { animation-delay: 0s; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .examples {
+            display: flex;
+            gap: 10px;
+            padding: 15px 20px;
+            flex-wrap: wrap;
+            background: #f0f4ff;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .example {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .example:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                height: 95vh;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .examples {
+                flex-direction: column;
+            }
+
+            .main-content {
+                flex-direction: column;
+            }
+
+            .info-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+                max-height: 200px;
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <button class="back-button" onclick="window.location.href='/'">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="header-content">
+            <h1><i class="fas fa-robot"></i> 甄企宝 AI求职助手</h1>
+            <p>智能求职指导，简历优化，面试准备，职业规划</p>
+        </div>
+        <div class="api-status">
+            <div class="status-indicator"></div>
+            <span>服务已连接</span>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="info-panel">
+            <h2><i class="fas fa-info-circle"></i> 关于AI求职助手</h2>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="feature-title">企业认证保障</div>
+                </div>
+                <div class="feature-content">
+                    甄企宝严格审核企业资质，确保所有职位信息真实可靠，远离求职陷阱。
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="feature-title">法律援助支持</div>
+                </div>
+                <div class="feature-content">
+                    专业律师团队提供薪资拖欠、合同纠纷等法律援助，维护您的权益。
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="feature-title">职位真实评价</div>
+                </div>
+                <div class="feature-content">
+                    真实员工评价，了解公司环境、薪资发放情况，选择最合适的工作。
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="feature-title">AI智能助手</div>
+                </div>
+                <div class="feature-content">
+                    24小时在线的AI求职助手，解答求职疑问，提供专业建议。
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-history" id="chatHistory">
+                <div class="message ai-message">
+                    <div class="message-header">
+                        <i class="fas fa-robot"></i> AI求职助手
+                    </div>
+                    <div class="message-content">
+                        您好！我是甄企宝AI助手，专注于解决求职过程中的各种问题。我可以帮助您：
+                        <ul style="margin-top: 10px; padding-left: 20px;">
+                            <li>优化简历和求职信</li>
+                            <li>准备面试问题和技巧</li>
+                            <li>分析职位要求和薪资水平</li>
+                            <li>提供职业发展建议</li>
+                            <li>解答求职法律问题</li>
+                        </ul>
+                        请问有什么可以帮您的？
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="examples">
+                <div class="example" onclick="setExample(this)">如何优化我的前端开发工程师简历？</div>
+                <div class="example" onclick="setExample(this)">Java开发工程师面试常见问题有哪些？</div>
+                <div class="example" onclick="setExample(this)">在上海，3年前端开发经验薪资范围是多少？</div>
+                <div class="example" onclick="setExample(this)">遇到薪资拖欠该如何维权？</div>
+            </div>
+
+            <div class="input-container">
+                <input type="text"
+                       class="message-input"
+                       id="messageInput"
+                       placeholder="输入您的问题..."
+                       onkeypress="handleKeyPress(event)">
+                <button class="send-button" id="sendButton" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        甄企宝求职平台 &copy; 2023 | 安全求职，远离陷阱
+    </div>
+</div>
+
+<script>
+    // DOM元素
+    const chatHistory = document.getElementById('chatHistory');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const typingIndicator = document.getElementById('typingIndicator');
+
+    // 设置示例问题
+    function setExample(element) {
+        messageInput.value = element.textContent;
+        messageInput.focus();
+    }
+
+    // 处理回车键
+    function handleKeyPress(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            sendMessage();
+        }
+    }
+
+    // 发送消息到后端
+    async function sendMessage() {
+        const message = messageInput.value.trim();
+        if (!message) return;
+
+        // 添加用户消息到聊天历史
+        addMessageToHistory(message, 'user');
+
+        // 清空输入框
+        messageInput.value = '';
+        messageInput.focus();
+
+        // 禁用发送按钮
+        sendButton.disabled = true;
+
+        // 显示"正在输入"指示器
+        typingIndicator.style.display = 'flex';
+
+        try {
+            // 调用后端API
+            const response = await fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: message
+            });
+
+            if (!response.ok) {
+                throw new Error(`API请求失败: ${response.status}`);
+            }
+
+            const aiResponse = await response.text();
+
+            // 添加AI回复到聊天历史
+            addMessageToHistory(aiResponse, 'ai');
+
+        } catch (error) {
+            // 显示错误信息
+            addMessageToHistory(`错误: ${error.message}`, 'ai');
+            console.error('API调用错误:', error);
+        } finally {
+            // 隐藏"正在输入"指示器
+            typingIndicator.style.display = 'none';
+
+            // 启用发送按钮
+            sendButton.disabled = false;
+
+            // 滚动到底部
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    }
+
+    // 添加消息到聊天历史
+    function addMessageToHistory(content, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message');
+
+        if (sender === 'user') {
+            messageDiv.classList.add('user-message');
+            messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <i class="fas fa-user"></i> 您
+                    </div>
+                    <div class="message-content">${content}</div>
+                `;
+        } else {
+            messageDiv.classList.add('ai-message');
+            messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <i class="fas fa-robot"></i> AI求职助手
+                    </div>
+                    <div class="message-content">${content}</div>
+                `;
+        }
+
+        chatHistory.appendChild(messageDiv);
+
+        // 滚动到底部
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    // 页面加载时聚焦输入框
+    window.onload = function() {
+        messageInput.focus();
+    };
+</script>
+</body>
+</html>

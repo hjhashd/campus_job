@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业认证管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --border-radius: 10px;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #3c4b64;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.8rem 1.5rem;
+            margin: 0.2rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar .logo {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar .logo h4 {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .main-content {
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-header h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .dashboard-header p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .admin-badge {
+            background: linear-gradient(120deg, #4361ee, #3a0ca3);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card.border-primary::before {
+            background: var(--primary);
+        }
+
+        .stat-card.border-warning::before {
+            background: var(--warning);
+        }
+
+        .stat-card.border-success::before {
+            background: var(--success);
+        }
+
+        .stat-card.border-danger::before {
+            background: #dc3545;
+        }
+
+        .stat-card i {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .stat-card .card-title {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .display-6 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            color: #2c3e50;
+        }
+
+        .filter-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-section label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .table-header {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eef2f7;
+            margin-bottom: 1.25rem;
+        }
+
+        table {
+            font-size: 0.95rem;
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+        }
+
+        thead tr {
+            background: #f8fafc;
+        }
+
+        thead th {
+            font-weight: 600;
+            color: #4a5568;
+            padding: 1rem 1.25rem;
+            border-bottom: none;
+        }
+
+        tbody tr {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        tbody tr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        tbody td {
+            padding: 1.1rem 1.25rem;
+            vertical-align: middle;
+            border-top: none;
+            border-bottom: none;
+        }
+
+        tbody td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        tbody td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .progress {
+            border-radius: 50px;
+            height: 8px;
+            width: 100px;
+            background: #e9ecef;
+        }
+
+        .progress-bar {
+            border-radius: 50px;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .badge-pending {
+            background: rgba(255, 193, 7, 0.15);
+            color: #e6a000;
+        }
+
+        .badge-approved {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .badge-rejected {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+
+        .badge-low-risk {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .badge-medium-risk {
+            background: rgba(255, 193, 7, 0.15);
+            color: #e6a000;
+        }
+
+        .badge-high-risk {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+
+        .action-btn {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            border-radius: 6px;
+            box-shadow: none !important;
+        }
+
+        .action-btn:last-child {
+            margin-right: 0;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .page-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .pagination .page-item {
+            margin: 0 2px;
+        }
+
+        .pagination .page-link {
+            border-radius: 6px !important;
+            border: none;
+            min-width: 36px;
+            text-align: center;
+            color: #4a5568;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .pagination .page-link:hover {
+            background: #f1f5f9;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary);
+            color: white;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #adb5bd;
+            box-shadow: none;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 1.25rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ced4da;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 992px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1.5rem;
+            }
+        }
+
+        /* 添加下拉菜单样式 */
+        .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: none;
+            padding: 0.5rem;
+            min-width: 200px;
+        }
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 18px;
+            text-align: center;
+        }
+        .dropdown-divider {
+            margin: 0.5rem 0;
+        }
+
+        /* 添加下拉菜单样式 */
+        .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border: none;
+            padding: 0.5rem;
+            min-width: 200px;
+        }
+        .dropdown-item {
+            padding: 0.75rem 1rem;
+            border-radius: 5px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .dropdown-item:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 18px;
+            text-align: center;
+        }
+        .dropdown-divider {
+            margin: 0.5rem 0;
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- 侧边栏 -->
+    <div class="sidebar flex-shrink-0" style="width: 250px;">
+        <div class="logo">
+            <h4 class="text-center"><i class="bi bi-person-badge"></i> 企业职位系统</h4>
+        </div>
+        <ul class="nav flex-column mt-4">
+            <li class="nav-item">
+                <a class="nav-link active" href="/dashboard">
+                    <i class="bi bi-speedometer2"></i> 控制台
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/users/list">
+                    <i class="bi bi-people"></i> 用户管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/jobs">
+                    <i class="bi bi-building"></i> 职业管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/auth/list">
+                    <i class="bi bi-shield-check"></i> 认证审核
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/account">
+                    <i class="bi bi-gear"></i> 账户设置
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="header-container">
+            <h1 class="page-title">用户管理系统</h1>
+            <!-- 修改用户信息区域为下拉菜单 -->
+            <div class="dropdown">
+                <a class="user-info dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <div>
+                        <div class="fw-bold">管理员</div>
+                    </div>
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/">
+                        <i class="bi bi-house-door"></i> 回到首页
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="/logout">
+                        <i class="bi bi-box-arrow-right"></i> 退出登录
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-container">
+                <div class="stat-card border-primary">
+                    <i class="bi bi-building text-primary"></i>
+                    <h5 class="card-title">全部认证</h5>
+                    <p class="display-6 fw-bold" th:text="${stats != null ? stats.get('total') : 0}">0</p>
+                </div>
+
+                <div class="stat-card border-warning">
+                    <i class="bi bi-hourglass-split text-warning"></i>
+                    <h5 class="card-title">待处理</h5>
+                    <p class="display-6 fw-bold" th:text="${stats != null ? stats.get('pending') : 0}">0</p>
+                </div>
+
+                <div class="stat-card border-success">
+                    <i class="bi bi-check-circle text-success"></i>
+                    <h5 class="card-title">已通过</h5>
+                    <p class="display-6 fw-bold" th:text="${stats != null ? stats.get('approved') : 0}">0</p>
+                </div>
+
+                <div class="stat-card border-danger">
+                    <i class="bi bi-x-circle text-danger"></i>
+                    <h5 class="card-title">已拒绝</h5>
+                    <p class="display-6 fw-bold" th:text="${stats != null ? stats.get('rejected') : 0}">0</p>
+                </div>
+            </div>
+
+            <!-- 筛选区域 -->
+            <div class="filter-section">
+                <form th:action="@{/admin/auth/list}" method="get">
+                    <div class="row g-3">
+                        <div class="col-lg-4 col-md-6">
+                            <label class="form-label">企业名称/联系人/电话</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                                <input type="text" class="form-control" name="search" th:value="${search}" placeholder="搜索...">
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label">认证状态</label>
+                            <select class="form-select" name="status">
+                                <option value="">全部状态</option>
+                                <option th:value="'PENDING'" th:selected="${status == 'PENDING'}">待处理</option>
+                                <option th:value="'APPROVED'" th:selected="${status == 'APPROVED'}">已通过</option>
+                                <option th:value="'REJECTED'" th:selected="${status == 'REJECTED'}">已拒绝</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <label class="form-label">信用评分</label>
+                            <select class="form-select" name="scoreRange">
+                                <option value="">全部评分</option>
+                                <option th:value="'high'" th:selected="${scoreRange == 'high'}">高 (80+)</option>
+                                <option th:value="'medium'" th:selected="${scoreRange == 'medium'}">中 (60-79)</option>
+                                <option th:value="'low'" th:selected="${scoreRange == 'low'}">低 (&lt;60)</option>
+                            </select>
+                        </div>
+                        <div class="col-lg-2 col-md-6 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="bi bi-funnel me-1"></i> 筛选
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- 认证列表 -->
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold">认证申请列表</h5>
+                        <div class="text-muted">
+                            共 <span th:text="${totalItems}" class="fw-medium">0</span> 条记录
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead>
+                        <tr>
+                            <th>企业名称</th>
+                            <th>联系人</th>
+                            <th>联系电话</th>
+                            <th>信用评分</th>
+                            <th>风险等级</th>
+                            <th>状态</th>
+                            <th>最后审核时间</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="app : ${pageData}">
+                            <td th:text="${app.companyName}">公司名称</td>
+                            <td th:text="${app.contactPerson}">联系人</td>
+                            <td th:text="${app.phone}">联系电话</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="progress" style="width: 100px;">
+                                        <div class="progress-bar" role="progressbar"
+                                             th:style="'width: ' + ${app.creditScore} + '%;'"
+                                             th:classappend="${app.creditScore >= 85} ? 'bg-success' :
+                                                             (${app.creditScore >= 70} ? 'bg-warning' : 'bg-danger')">
+                                        </div>
+                                    </div>
+                                    <span class="ms-2 fw-bold" th:text="${app.creditScore}">80</span>
+                                </div>
+                            </td>
+                            <td>
+                                <span th:if="${app.riskLevel == 'LOW'}" class="badge badge-low-risk">低风险</span>
+                                <span th:if="${app.riskLevel == 'MEDIUM'}" class="badge badge-medium-risk">中风险</span>
+                                <span th:if="${app.riskLevel == 'HIGH'}" class="badge badge-high-risk">高风险</span>
+                            </td>
+                            <td>
+                                <span th:if="${app.status == 'PENDING'}" class="badge badge-pending">待处理</span>
+                                <span th:if="${app.status == 'APPROVED'}" class="badge badge-approved">已通过</span>
+                                <span th:if="${app.status == 'REJECTED'}" class="badge badge-rejected">已拒绝</span>
+                            </td>
+                            <td th:text="${#temporals.format(app.lastAuditTime, 'yyyy-MM-dd HH:mm')}">2023-01-01</td>
+                            <!-- 表格操作列 -->
+                            <td>
+                                <a th:href="'/admin/auth/' + ${app.authId}"
+                                   class="btn btn-sm btn-outline-primary action-btn">
+                                    <i class="bi bi-eye"></i> 详情
+                                </a>
+
+                                <!-- 通过按钮 -->
+                                <form th:if="${app.status == 'PENDING'}"
+                                      th:action="@{/admin/auth/{authId}/approve(authId=${app.authId},
+               search=${search}, status=${status}, scoreRange=${scoreRange})}"
+                                      method="post"
+                                      style="display: inline;">
+                                    <button type="submit" class="btn btn-sm btn-success action-btn">
+                                        <i class="bi bi-check-lg"></i> 通过
+                                    </button>
+                                </form>
+
+                                <!-- 拒绝按钮（触发模态框） -->
+                                <button th:if="${app.status == 'PENDING'}"
+                                        class="btn btn-sm btn-danger action-btn"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#rejectModal"
+                                        th:data-authid="${app.authId}">
+                                    <i class="bi bi-x-lg"></i> 拒绝
+                                </button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(pageData)}">
+                            <td colspan="8" class="empty-state">
+                                <i class="bi bi-inbox"></i>
+                                <p>未找到符合条件的认证申请</p>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 分页控件 -->
+                <div class="pagination-container">
+                    <div class="page-info">
+                        显示 <span th:text="${(currentPage - 1) * pageSize + 1}" class="fw-medium">1</span> 到
+                        <span th:text="${(currentPage - 1) * pageSize + #lists.size(pageData)}" class="fw-medium">10</span> 条，
+                        共 <span th:text="${totalItems}" class="fw-medium">0</span> 条记录
+                    </div>
+
+                    <nav>
+                        <ul class="pagination mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/auth/list(page=1, size=${pageSize},
+                                                                         search=${search},
+                                                                         status=${status},
+                                                                         scoreRange=${scoreRange})}">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/auth/list(page=${currentPage - 1}, size=${pageSize},
+                                                                         search=${search},
+                                                                         status=${status},
+                                                                         scoreRange=${scoreRange})}">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            <li th:each="page : ${#numbers.sequence(1, totalPages)}"
+                                class="page-item" th:classappend="${currentPage == page} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/auth/list(page=${page}, size=${pageSize},
+                                                                             search=${search},
+                                                                             status=${status},
+                                                                             scoreRange=${scoreRange})}"
+                                   th:text="${page}">1</a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/auth/list(page=${currentPage + 1}, size=${pageSize},
+                                                                         search=${search},
+                                                                         status=${status},
+                                                                         scoreRange=${scoreRange})}">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/auth/list(page=${totalPages}, size=${pageSize},
+                                                                         search=${search},
+                                                                         status=${status},
+                                                                         scoreRange=${scoreRange})}">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 拒绝模态框（列表页） -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-hidden="true">
+    <form th:action="@{/admin/auth/{authId}/reject}" method="post">
+        <input type="hidden" name="authId" id="rejectAuthId">
+        <div class="modal-body">
+            <textarea class="form-control" name="reason" rows="4" required></textarea>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn btn-danger">确认拒绝</button>
+        </div>
+    </form>
+</div>
+
+<!-- 无结果提示 -->
+<div th:if="${totalItems == 0}" class="alert alert-info mt-4">
+    <i class="fas fa-info-circle"></i> 未找到匹配的用户
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 模态框显示时设置认证ID
+    document.getElementById('rejectModal').addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const authId = button.getAttribute('data-authid');
+        document.getElementById('rejectAuthId').value = authId;
+    });
+</script>
+</body>
+</html>

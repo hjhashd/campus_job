@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>控制台 - 求职系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.8rem 1.5rem;
+            margin: 0.2rem 0.5rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .sidebar .logo {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .main-content {
+            padding: 20px;
+            width: 100%;
+        }
+
+        .navbar {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+
+        .dashboard-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            margin-bottom: 20px;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-admin {
+            border-top: 4px solid var(--warning);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+
+        .stat-title {
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .welcome-card {
+            background: linear-gradient(120deg, #4361ee, #3a0ca3);
+            color: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .welcome-card .card-body {
+            position: relative;
+            z-index: 1;
+        }
+
+        .welcome-card::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .welcome-card::after {
+            content: '';
+            position: absolute;
+            bottom: -80px;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-top: 30px;
+            height: 350px;
+        }
+
+        canvas {
+            max-width: 100%;
+            display: block;
+            height: 300px !important;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                min-height: auto;
+                width: 100%;
+            }
+
+            .main-content {
+                padding: 15px;
+            }
+
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- 侧边栏 -->
+    <div class="sidebar flex-shrink-0" style="width: 250px;">
+        <div class="logo">
+            <h4 class="text-center"><i class="bi bi-person-badge"></i> 企业职位系统</h4>
+        </div>
+        <ul class="nav flex-column mt-4">
+            <li class="nav-item">
+                <a class="nav-link active" href="/dashboard">
+                    <i class="bi bi-speedometer2"></i> 控制台
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/users/list">
+                    <i class="bi bi-people"></i> 用户管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/jobs">
+                    <i class="bi bi-building"></i> 职业管理
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/auth/list">
+                    <i class="bi bi-shield-check"></i> 认证审核
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/admin/account">
+                    <i class="bi bi-gear"></i> 账户设置
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="d-flex flex-column w-100">
+        <!-- 顶部导航栏 -->
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                                <span>管理员</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="/admin/account"><i class="bi bi-gear me-2"></i> 账户设置</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a href="/logout" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i> 退出登录</a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <div class="container-fluid">
+                <!-- 欢迎卡片 -->
+                <div class="card welcome-card mb-4 border-0">
+                    <div class="card-body p-4">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h3 class="card-title">欢迎回来, <span>管理员</span>!</h3>
+                                <p class="card-text">
+                                    管理员，祝您工作顺利！
+                                </p>
+                                <a href="#" class="btn btn-light">查看通知</a>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <!-- 管理员图标 -->
+                                <i class="bi bi-shield-lock" style="font-size: 6rem; opacity: 0.3;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 统计卡片 -->
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="card dashboard-card card-admin">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="stat-title">总用户数</p>
+                                        <h3 class="stat-number">1,254</h3>
+                                    </div>
+                                    <div class="icon bg-danger text-white rounded-circle p-3">
+                                        <i class="bi bi-people fs-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card dashboard-card card-admin">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="stat-title">待审核认证</p>
+                                        <h3 class="stat-number">8</h3>
+                                    </div>
+                                    <div class="icon bg-warning text-white rounded-circle p-3">
+                                        <i class="bi bi-shield-check fs-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card dashboard-card card-admin">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="stat-title">企业总数</p>
+                                        <h3 class="stat-number">86</h3>
+                                    </div>
+                                    <div class="icon bg-info text-white rounded-circle p-3">
+                                        <i class="bi bi-buildings fs-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card dashboard-card card-admin">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <p class="stat-title">活跃岗位</p>
+                                        <h3 class="stat-number">342</h3>
+                                    </div>
+                                    <div class="icon bg-success text-white rounded-circle p-3">
+                                        <i class="bi bi-briefcase fs-2"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最新动态 -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">最新职位</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">Java高级开发工程师</h6>
+                                            <small>3天前</small>
+                                        </div>
+                                        <p class="mb-1">某知名互联网公司 · 北京 · 25K-40K</p>
+                                        <small>要求5年以上Java开发经验，熟悉Spring Cloud微服务架构。</small>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">前端开发工程师</h6>
+                                            <small>5天前</small>
+                                        </div>
+                                        <p class="mb-1">某金融科技公司 · 上海 · 20K-35K</p>
+                                        <small>要求3年以上前端开发经验，精通Vue.js或React。</small>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">产品经理</h6>
+                                            <small>1周前</small>
+                                        </div>
+                                        <p class="mb-1">某电商平台 · 深圳 · 18K-30K</p>
+                                        <small>要求有3年以上产品设计经验，熟悉电商业务流程。</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header bg-white">
+                                <h5 class="card-title mb-0">系统公告</h5>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item">
+                                        <small class="text-muted">2023-06-15</small>
+                                        <p class="mb-1">系统维护通知：本周末将进行系统升级，届时将暂停服务2小时。</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <small class="text-muted">2023-06-10</small>
+                                        <p class="mb-1">新增企业信用评分功能，帮助企业提升招聘可信度。</p>
+                                    </li>
+                                    <li class="list-group-item">
+                                        <small class="text-muted">2023-06-01</small>
+                                        <p class="mb-1">求职系统移动端APP正式上线，欢迎下载使用。</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 图表区域 -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-4"><i class="fas fa-chart-line me-2 text-primary"></i> 企业信用评分趋势</h5>
+                            <canvas id="creditChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <h5 class="mb-4"><i class="fas fa-coins me-2 text-warning"></i> 薪资分布分析</h5>
+                            <canvas id="salaryChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 引入Chart.js库 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 确保Chart.js已加载
+        if (typeof Chart !== 'undefined') {
+            // 企业信用评分趋势图
+            const creditCtx = document.getElementById('creditChart').getContext('2d');
+            new Chart(creditCtx, {
+                type: 'line',
+                data: {
+                    labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+                    datasets: [{
+                        label: '平均信用分',
+                        data: [82, 84, 83, 85, 86, 87, 88, 87, 88, 89, 88, 90],
+                        borderColor: '#4361ee',
+                        backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#4361ee',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 75,
+                            max: 95,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 薪资分布分析图
+            const salaryCtx = document.getElementById('salaryChart').getContext('2d');
+            new Chart(salaryCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['10-15K', '15-20K', '20-25K', '25-30K', '30-35K', '35-40K'],
+                    datasets: [{
+                        label: '职位数量',
+                        data: [85, 120, 210, 180, 95, 60],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.7)',
+                            'rgba(76, 201, 240, 0.7)',
+                            'rgba(72, 149, 239, 0.7)',
+                            'rgba(60, 55, 201, 0.7)',
+                            'rgba(247, 37, 133, 0.7)',
+                            'rgba(52, 58, 64, 0.7)'
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 5,
+                        hoverBackgroundColor: [
+                            'rgba(67, 97, 238, 1)',
+                            'rgba(76, 201, 240, 1)',
+                            'rgba(72, 149, 239, 1)',
+                            'rgba(60, 55, 201, 1)',
+                            'rgba(247, 37, 133, 1)',
+                            'rgba(52, 58, 64, 1)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('Chart.js 未加载');
+        }
+    });
+</script>
+</body>
+</html>

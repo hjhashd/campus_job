@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>账户设置 - 求职系统</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --success: #4cc9f0;
+      --info: #4895ef;
+      --warning: #f72585;
+      --light: #f8f9fa;
+      --dark: #212529;
+    }
+
+    body {
+      background-color: #f5f7fb;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .sidebar {
+      min-height: 100vh;
+      background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .sidebar .nav-link {
+      color: rgba(255, 255, 255, 0.8);
+      padding: 0.8rem 1.5rem;
+      margin: 0.2rem 0.5rem;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar .nav-link:hover,
+    .sidebar .nav-link.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+
+    .sidebar .nav-link i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+
+    .sidebar .logo {
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .main-content {
+      padding: 20px;
+      width: 100%;
+    }
+
+    .navbar {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+
+    .dashboard-card {
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: none;
+      margin-bottom: 20px;
+      background: white;
+    }
+
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-admin {
+      border-top: 4px solid var(--warning);
+    }
+
+    .user-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid white;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .account-section {
+      margin-bottom: 30px;
+    }
+
+    .account-header {
+      border-bottom: 2px solid #f0f2f5;
+      padding-bottom: 15px;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+    }
+
+    .account-header i {
+      background: var(--primary);
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+    }
+
+    .info-label {
+      font-weight: 600;
+      color: #495057;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 1.05rem;
+      margin-bottom: 15px;
+      color: #343a40;
+    }
+
+    .edit-icon {
+      color: var(--primary);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .edit-icon:hover {
+      color: var(--secondary);
+      transform: scale(1.1);
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+
+    .btn-save {
+      background: var(--primary);
+      border: none;
+      padding: 10px 25px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-save:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+    }
+
+    .security-alert {
+      background: rgba(247, 37, 133, 0.1);
+      border-left: 4px solid var(--warning);
+      padding: 15px;
+      border-radius: 0 8px 8px 0;
+      margin: 20px 0;
+    }
+
+    .avatar-upload {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+    }
+
+    .avatar-upload input[type="file"] {
+      position: absolute;
+      left: 0;
+      top: 0;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
+
+    .avatar-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .avatar-upload:hover .avatar-overlay {
+      opacity: 1;
+    }
+
+    .avatar-overlay i {
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        min-height: auto;
+        width: 100%;
+      }
+
+      .user-avatar {
+        width: 90px;
+        height: 90px;
+      }
+
+      .main-content {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="d-flex">
+  <!-- 侧边栏 -->
+  <div class="sidebar flex-shrink-0" style="width: 250px;">
+    <div class="logo">
+      <h4 class="text-center"><i class="bi bi-person-badge"></i> 求职系统</h4>
+    </div>
+    <ul class="nav flex-column mt-4">
+      <li class="nav-item">
+        <a class="nav-link" href="/dashboard">
+          <i class="bi bi-speedometer2"></i> 控制台
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/users/list">
+          <i class="bi bi-people"></i> 用户管理
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/jobs">
+          <i class="bi bi-building"></i> 职业管理
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/admin/auth/list">
+          <i class="bi bi-shield-check"></i> 认证审核
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link active" href="/admin/account">
+          <i class="bi bi-gear"></i> 账户设置
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="d-flex flex-column w-100">
+    <!-- 顶部导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                <span>管理员</span>
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="/admin/account"><i class="bi bi-person me-2"></i> 个人资料</a></li>
+                <li><a class="dropdown-item" href="/admin/account"><i class="bi bi-gear me-2"></i> 账户设置</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <a href="#" class="dropdown-item"><i class="bi bi-box-arrow-right me-2"></i> 退出登录</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 主内容区 -->
+    <div class="main-content">
+      <div class="container-fluid">
+        <div class="row mb-4">
+          <div class="col-12">
+            <h3 class="mb-0"><i class="bi bi-gear me-2 text-primary"></i> 账户设置</h3>
+            <nav aria-label="breadcrumb">
+              <ol class="breadcrumb bg-transparent p-0 mt-2">
+                <li class="breadcrumb-item"><a href="/dashboard">控制台</a></li>
+                <li class="breadcrumb-item active" aria-current="page">账户设置</li>
+              </ol>
+            </nav>
+          </div>
+        </div>
+
+        <!-- 操作结果消息 -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+          <span th:text="${success}"></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <span th:text="${error}"></span>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row">
+          <!-- 左侧个人信息 -->
+          <div class="col-lg-4">
+            <div class="card dashboard-card mb-4">
+              <div class="card-body text-center p-4">
+                <form th:action="@{/admin/account/avatar}" method="post" enctype="multipart/form-data">
+                  <div class="avatar-upload mb-3">
+                    <img th:src="${user.avatar != null ?
+                                                      '/uploads/' + user.avatar :
+                                                      '/images/default-avatar.png'}"
+                         class="user-avatar" id="avatarPreview" alt="管理员头像">
+                    <div class="avatar-overlay">
+                      <i class="bi bi-camera"></i>
+                    </div>
+                    <input type="file" id="avatarInput" name="avatarFile" accept="image/*">
+                  </div>
+                  <button type="submit" class="btn btn-outline-primary w-100">
+                    <i class="bi bi-upload me-2"></i> 更新头像
+                  </button>
+                </form>
+                <h4 class="mb-1 mt-3" th:text="${user.username}">管理员</h4>
+                <p class="text-muted mb-3" th:text="${user.role}">超级管理员</p>
+                <div class="d-flex justify-content-center mb-3">
+                  <div class="px-3 text-center">
+                    <h5 class="mb-0">86</h5>
+                    <small class="text-muted">管理企业</small>
+                  </div>
+                  <div class="px-3 text-center">
+                    <h5 class="mb-0">1,254</h5>
+                    <small class="text-muted">管理用户</small>
+                  </div>
+                  <div class="px-3 text-center">
+                    <h5 class="mb-0">2年</h5>
+                    <small class="text-muted">系统使用</small>
+                  </div>
+                </div>
+                <button class="btn btn-outline-primary w-100">
+                  <i class="bi bi-download me-2"></i> 导出个人数据
+                </button>
+              </div>
+            </div>
+
+            <div class="card dashboard-card">
+              <div class="card-body p-4">
+                <h5 class="mb-4"><i class="bi bi-shield-lock me-2 text-warning"></i> 账户安全</h5>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-0">密码强度</h6>
+                    <small class="text-success">非常强</small>
+                  </div>
+                  <div class="bg-success text-white rounded-circle p-2">
+                    <i class="bi bi-check-lg"></i>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-0">双重认证</h6>
+                    <small class="text-muted">未启用</small>
+                  </div>
+                  <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="twoFactorSwitch">
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                  <div>
+                    <h6 class="mb-0">登录设备</h6>
+                    <small>3台设备</small>
+                  </div>
+                  <button class="btn btn-sm btn-outline-secondary">管理</button>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <div>
+                    <h6 class="mb-0">最近登录</h6>
+                    <small>今天 09:24, 来自北京</small>
+                  </div>
+                  <i class="bi bi-info-circle text-primary"></i>
+                </div>
+
+                <div class="security-alert mt-4">
+                  <h6><i class="bi bi-exclamation-triangle me-2"></i> 安全提示</h6>
+                  <p class="mb-0 small">您的账户已安全使用728天，请定期更新密码以保障账户安全。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右侧设置区域 -->
+          <div class="col-lg-8">
+            <!-- 基本信息 -->
+            <div class="card dashboard-card mb-4">
+              <div class="card-body p-4">
+                <div class="account-header mb-4">
+                  <i class="bi bi-person"></i>
+                  <h4 class="mb-0">基本信息</h4>
+                </div>
+
+                <form th:action="@{/admin/account/update}" method="post">
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">用户名</label>
+                      <input type="text" class="form-control"
+                             th:value="${user.username}" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">身份类型</label>
+                      <input type="text" class="form-control"
+                             th:value="${user.identityType}" readonly>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">电子邮箱</label>
+                      <input type="email" class="form-control" name="email"
+                             th:value="${user.email}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">手机号码</label>
+                      <input type="tel" class="form-control" name="phone"
+                             th:value="${user.phone}">
+                    </div>
+                  </div>
+
+                  <div th:if="${user.identityType == 'STUDENT'}" class="student-fields">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">学校</label>
+                        <input type="text" class="form-control" name="school"
+                               th:value="${user.school}">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">专业</label>
+                        <input type="text" class="form-control" name="major"
+                               th:value="${user.major}">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">学历</label>
+                        <input type="text" class="form-control" name="education"
+                               th:value="${user.education}">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div th:if="${user.identityType == 'COMPANY'}" class="company-fields">
+                    <div class="row">
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">公司名称</label>
+                        <input type="text" class="form-control" name="companyName"
+                               th:value="${user.companyName}">
+                      </div>
+                      <div class="col-md-6 mb-3">
+                        <label class="form-label">联系人</label>
+                        <input type="text" class="form-control" name="contactPerson"
+                               th:value="${user.contactPerson}">
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">角色</label>
+                      <input type="text" class="form-control"
+                             th:value="${user.role}" readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">账户状态</label>
+                      <input type="text" class="form-control"
+                             th:value="${user.status == 1 ? '活跃' : '非活跃'}"
+                             th:classappend="${user.status == 1 ? 'text-success' : 'text-danger'}"
+                             readonly>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">注册时间</label>
+                      <input type="text" class="form-control"
+                             th:value="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}"
+                             readonly>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                      <label class="form-label">最后更新</label>
+                      <input type="text" class="form-control"
+                             th:value="${#temporals.format(user.updatedAt, 'yyyy-MM-dd HH:mm')}"
+                             readonly>
+                    </div>
+                  </div>
+
+                  <div class="text-end mt-3">
+                    <button type="submit" class="btn btn-save">保存更改</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- 密码设置 -->
+            <div class="card dashboard-card mb-4">
+              <div class="card-body p-4">
+                <div class="account-header mb-4">
+                  <i class="bi bi-lock"></i>
+                  <h4 class="mb-0">密码设置</h4>
+                </div>
+
+                <form th:action="@{/admin/account/password}" method="post">
+                  <div class="mb-3">
+                    <label class="form-label">当前密码</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control"
+                             name="currentPassword" placeholder="输入当前密码">
+                      <button class="btn btn-outline-secondary" type="button" id="toggleCurrentPassword">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">新密码</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control"
+                             name="newPassword" placeholder="输入新密码">
+                      <button class="btn btn-outline-secondary" type="button" id="toggleNewPassword">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
+                    <div class="form-text">密码至少8个字符，包含字母和数字</div>
+                  </div>
+
+                  <div class="mb-4">
+                    <label class="form-label">确认新密码</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control"
+                             name="confirmPassword" placeholder="再次输入新密码">
+                      <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="text-end">
+                    <button type="submit" class="btn btn-save">更新密码</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- 高级设置 -->
+            <div class="card dashboard-card">
+              <div class="card-body p-4">
+                <div class="account-header mb-4">
+                  <i class="bi bi-sliders"></i>
+                  <h4 class="mb-0">高级设置</h4>
+                </div>
+
+                <div class="mb-4">
+                  <h6 class="d-flex align-items-center">
+                    <i class="bi bi-envelope me-2 text-info"></i>
+                    邮件通知设置
+                    <i class="bi bi-info-circle ms-2 text-muted small"></i>
+                  </h6>
+                  <div class="form-check form-switch ms-4 mb-2">
+                    <input class="form-check-input" type="checkbox" id="systemNotification" checked>
+                    <label class="form-check-label" for="systemNotification">系统通知</label>
+                  </div>
+                  <div class="form-check form-switch ms-4 mb-2">
+                    <input class="form-check-input" type="checkbox" id="securityAlerts" checked>
+                    <label class="form-check-label" for="securityAlerts">安全警报</label>
+                  </div>
+                  <div class="form-check form-switch ms-4">
+                    <input class="form-check-input" type="checkbox" id="promotionEmails">
+                    <label class="form-check-label" for="promotionEmails">产品推广</label>
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <h6 class="d-flex align-items-center">
+                    <i class="bi bi-trash me-2 text-danger"></i>
+                    账户删除
+                    <i class="bi bi-info-circle ms-2 text-muted small"></i>
+                  </h6>
+                  <p class="small text-muted ms-4">
+                    删除您的账户将永久移除所有个人数据，此操作不可撤销。
+                  </p>
+                  <button class="btn btn-outline-danger ms-4 mt-2" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                    <i class="bi bi-trash me-1"></i> 删除我的账户
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 删除账户确认模态框 -->
+<div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteAccountModalLabel">确认删除账户</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>您确定要永久删除您的账户吗？此操作不可撤销，所有个人数据将被永久移除。</p>
+        <p class="text-danger"><strong>警告：</strong>删除账户后将无法恢复任何数据。</p>
+        <div class="form-check mt-3">
+          <input class="form-check-input" type="checkbox" id="confirmDelete">
+          <label class="form-check-label" for="confirmDelete">
+            我理解此操作的后果，并确认删除我的账户
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+        <button type="button" class="btn btn-danger" id="deleteAccountBtn" disabled>永久删除账户</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // 头像上传预览
+    const avatarInput = document.getElementById('avatarInput');
+    const avatarPreview = document.getElementById('avatarPreview');
+
+    if (avatarInput) {
+      avatarInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            avatarPreview.src = e.target.result;
+          }
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+
+    // 切换密码可见性
+    function setupPasswordToggle(buttonId, inputSelector) {
+      const toggleButton = document.getElementById(buttonId);
+      if (!toggleButton) return;
+
+      const passwordInput = document.querySelector(inputSelector);
+      let isVisible = false;
+
+      toggleButton.addEventListener('click', function() {
+        isVisible = !isVisible;
+        passwordInput.type = isVisible ? 'text' : 'password';
+        toggleButton.innerHTML = isVisible ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+      });
+    }
+
+    setupPasswordToggle('toggleCurrentPassword', '#passwordForm input[type="password"]:nth-child(1)');
+    setupPasswordToggle('toggleNewPassword', '#passwordForm input[type="password"]:nth-child(2)');
+    setupPasswordToggle('toggleConfirmPassword', '#passwordForm input[type="password"]:nth-child(3)');
+
+    // 删除账户确认
+    const confirmDeleteCheckbox = document.getElementById('confirmDelete');
+    const deleteAccountBtn = document.getElementById('deleteAccountBtn');
+
+    if (confirmDeleteCheckbox && deleteAccountBtn) {
+      confirmDeleteCheckbox.addEventListener('change', function() {
+        deleteAccountBtn.disabled = !this.checked;
+      });
+    }
+
+    // 删除账户按钮
+    if (deleteAccountBtn) {
+      deleteAccountBtn.addEventListener('click', function() {
+        alert('账户删除功能已触发，实际项目中应调用后端API');
+        // 实际项目中这里应该调用后端API删除账户
+        // 然后重定向到登录页面或主页
+      });
+    }
+  });
+</script>
+</body>
+</html>

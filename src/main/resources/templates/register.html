@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>求职系统 - 注册</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px 0;
+        }
+
+        .register-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.95);
+        }
+
+        .register-header {
+            background: var(--primary);
+            padding: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .register-body {
+            padding: 2rem;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .form-step {
+            display: none;
+        }
+
+        .form-step.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .progress {
+            height: 10px;
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            background-color: var(--primary);
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            position: relative;
+            z-index: 2;
+        }
+
+        .step.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .step.completed {
+            background: #4cc9f0;
+            color: white;
+        }
+
+        .step-label {
+            position: absolute;
+            top: 45px;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .step.completed .step-label {
+            color: #4cc9f0;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .role-card {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .role-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .role-card.selected {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .role-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+        }
+
+        .form-floating {
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .terms {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="register-card">
+                <div class="register-header text-white">
+                    <h1><i class="bi bi-person-plus me-2"></i>加入求职系统</h1>
+                    <p class="mb-0">创建您的账户，开启职业新旅程</p>
+                </div>
+
+                <div class="register-body">
+                    <!-- 进度指示器 -->
+                    <div class="step-indicator">
+                        <div class="step active" data-step="1">
+                            1
+                            <span class="step-label">选择身份</span>
+                        </div>
+                        <div class="step" data-step="2">
+                            2
+                            <span class="step-label">基本信息</span>
+                        </div>
+                        <div class="step" data-step="3">
+                            3
+                            <span class="step-label">账户信息</span>
+                        </div>
+                        <div class="step" data-step="4">
+                            4
+                            <span class="step-label">完成注册</span>
+                        </div>
+                    </div>
+
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <form id="registrationForm">
+                        <!-- 步骤1: 选择身份 -->
+                        <div class="form-step active" id="step1">
+                            <h3 class="mb-4">选择您的身份</h3>
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <div class="role-card" data-role="student">
+                                        <div class="role-icon">
+                                            <i class="bi bi-mortarboard"></i>
+                                        </div>
+                                        <h4>学生</h4>
+                                        <p>寻找实习或全职工作</p>
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="identityType" id="studentRole" value="STUDENT" checked>
+                                            <label class="form-check-label ms-2" for="studentRole">
+                                                选择
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    <div class="role-card" data-role="company">
+                                        <div class="role-icon">
+                                            <i class="bi bi-building"></i>
+                                        </div>
+                                        <h4>企业</h4>
+                                        <p>招聘优秀人才</p>
+                                        <div class="form-check d-flex justify-content-center">
+                                            <input class="form-check-input" type="radio" name="identityType" id="companyRole" value="COMPANY">
+                                            <label class="form-check-label ms-2" for="companyRole">
+                                                选择
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="nav-buttons">
+                                <div></div> <!-- 空div用于占位 -->
+                                <button type="button" class="btn btn-primary btn-lg next-step">下一步 <i class="bi bi-arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 步骤2: 基本信息 -->
+                        <div class="form-step" id="step2">
+                            <h3 class="mb-4">填写基本信息</h3>
+
+                            <div id="studentFields">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="school" placeholder="学校名称">
+                                            <label for="school">学校名称</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="major" placeholder="专业">
+                                            <label for="major">专业</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <select class="form-select" id="education">
+                                                <option value="专科">专科</option>
+                                                <option value="本科" selected>本科</option>
+                                                <option value="硕士">硕士</option>
+                                                <option value="博士">博士</option>
+                                            </select>
+                                            <label for="education">学历</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="studentPhone" placeholder="联系电话">
+                                            <label for="studentPhone">联系电话</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="companyFields" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="companyName" placeholder="企业名称">
+                                            <label for="companyName">企业名称</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <select class="form-select" id="companySize">
+                                                <option value="初创企业">初创企业</option>
+                                                <option value="中小型企业" selected>中小型企业</option>
+                                                <option value="大型企业">大型企业</option>
+                                                <option value="跨国集团">跨国集团</option>
+                                            </select>
+                                            <label for="companySize">企业规模</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="contactPerson" placeholder="联系人">
+                                            <label for="contactPerson">联系人</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating mb-3">
+                                            <input type="text" class="form-control" id="companyPhone" placeholder="联系电话">
+                                            <label for="companyPhone">联系电话</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="nav-buttons">
+                                <button type="button" class="btn btn-outline-secondary btn-lg prev-step"><i class="bi bi-arrow-left"></i> 上一步</button>
+                                <button type="button" class="btn btn-primary btn-lg next-step">下一步 <i class="bi bi-arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 步骤3: 账户信息 -->
+                        <div class="form-step" id="step3">
+                            <h3 class="mb-4">设置账户信息</h3>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="text" class="form-control" id="username" placeholder="用户名" required>
+                                        <label for="username">用户名</label>
+                                        <div class="form-text">4-20个字符，只能包含字母、数字和下划线</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="email" class="form-control" id="email" placeholder="电子邮箱" required>
+                                        <label for="email">电子邮箱</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" class="form-control" id="password" placeholder="密码" required>
+                                        <label for="password">密码</label>
+                                        <i class="bi bi-eye-slash password-toggle" data-target="password"></i>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-floating mb-3">
+                                        <input type="password" class="form-control" id="confirmPassword" placeholder="确认密码" required>
+                                        <label for="confirmPassword">确认密码</label>
+                                        <i class="bi bi-eye-slash password-toggle" data-target="confirmPassword"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="terms" required>
+                                    <label class="form-check-label" for="terms">
+                                        我同意 <a href="#" class="text-decoration-none">服务条款</a> 和 <a href="#" class="text-decoration-none">隐私政策</a>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="nav-buttons">
+                                <button type="button" class="btn btn-outline-secondary btn-lg prev-step"><i class="bi bi-arrow-left"></i> 上一步</button>
+                                <button type="button" class="btn btn-primary btn-lg next-step">下一步 <i class="bi bi-arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- 步骤4: 完成注册 -->
+                        <div class="form-step" id="step4">
+                            <div class="text-center py-5">
+                                <i class="bi bi-cloud-upload" style="font-size: 4rem;"></i>
+                                <h2 class="my-4">准备完成注册</h2>
+                                <p class="lead mb-4">请确认您的注册信息</p>
+
+                                <div class="d-grid gap-2">
+                                    <button type="button" id="submitBtn" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-check-circle"></i> 确认注册
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary prev-step">
+                                        <i class="bi bi-arrow-left"></i> 返回修改
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 步骤导航
+        const steps = document.querySelectorAll('.form-step');
+        const stepIndicators = document.querySelectorAll('.step');
+        const nextButtons = document.querySelectorAll('.next-step');
+        const prevButtons = document.querySelectorAll('.prev-step');
+        const progressBar = document.querySelector('.progress-bar');
+        const roleCards = document.querySelectorAll('.role-card');
+        const studentFields = document.getElementById('studentFields');
+        const companyFields = document.getElementById('companyFields');
+
+        let currentStep = 1;
+
+        // 切换步骤
+        function goToStep(step) {
+            // 隐藏所有步骤
+            steps.forEach(s => s.classList.remove('active'));
+            // 显示当前步骤
+            document.getElementById(`step${step}`).classList.add('active');
+
+            // 更新步骤指示器
+            stepIndicators.forEach((indicator, index) => {
+                indicator.classList.remove('active', 'completed');
+                if (index + 1 < step) {
+                    indicator.classList.add('completed');
+                } else if (index + 1 === step) {
+                    indicator.classList.add('active');
+                }
+            });
+
+            // 更新进度条
+            const progress = (step - 1) / 3 * 100;
+            progressBar.style.width = `${progress}%`;
+
+            currentStep = step;
+        }
+
+        // 下一步按钮事件
+        nextButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                if (validateStep(currentStep)) {
+                    goToStep(currentStep + 1);
+                }
+            });
+        });
+
+        // 上一步按钮事件
+        prevButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                goToStep(currentStep - 1);
+            });
+        });
+
+        // 角色选择卡片事件
+        roleCards.forEach(card => {
+            card.addEventListener('click', function() {
+                const role = this.getAttribute('data-role');
+
+                // 更新选中状态
+                roleCards.forEach(c => c.classList.remove('selected'));
+                this.classList.add('selected');
+
+                // 更新单选按钮
+                document.querySelector(`input[value="${role.toUpperCase()}"]`).checked = true;
+
+                // 显示对应字段
+                if (role === 'student') {
+                    studentFields.style.display = 'block';
+                    companyFields.style.display = 'none';
+                } else {
+                    studentFields.style.display = 'none';
+                    companyFields.style.display = 'block';
+                }
+            });
+        });
+
+        // 密码显示/隐藏切换
+        document.querySelectorAll('.password-toggle').forEach(toggle => {
+            toggle.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const input = document.getElementById(targetId);
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+
+                this.classList.toggle('bi-eye');
+                this.classList.toggle('bi-eye-slash');
+            });
+        });
+
+        // 步骤验证
+        function validateStep(step) {
+            if (step === 1) {
+                // 身份选择验证
+                const selectedRole = document.querySelector('input[name="identityType"]:checked');
+                if (!selectedRole) {
+                    alert('请选择您的身份');
+                    return false;
+                }
+                return true;
+            } else if (step === 2) {
+                // 基本信息验证
+                const identityType = document.querySelector('input[name="identityType"]:checked').value;
+
+                if (identityType === 'STUDENT') {
+                    const school = document.getElementById('school').value;
+                    const major = document.getElementById('major').value;
+
+                    if (!school || !major) {
+                        alert('请填写完整的学校信息');
+                        return false;
+                    }
+                } else {
+                    const companyName = document.getElementById('companyName').value;
+                    const contactPerson = document.getElementById('contactPerson').value;
+
+                    if (!companyName || !contactPerson) {
+                        alert('请填写完整的企业信息');
+                        return false;
+                    }
+                }
+                return true;
+            } else if (step === 3) {
+                // 账户信息验证
+                const username = document.getElementById('username').value;
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const terms = document.getElementById('terms').checked;
+
+                if (!username || username.length < 4) {
+                    alert('用户名至少需要4个字符');
+                    return false;
+                }
+
+                if (!email || !validateEmail(email)) {
+                    alert('请输入有效的电子邮箱');
+                    return false;
+                }
+
+                if (!password || password.length < 6) {
+                    alert('密码至少需要6个字符');
+                    return false;
+                }
+
+                if (password !== confirmPassword) {
+                    alert('两次输入的密码不一致');
+                    return false;
+                }
+
+                if (!terms) {
+                    alert('请同意服务条款和隐私政策');
+                    return false;
+                }
+
+                return true;
+            }
+            return true;
+        }
+
+        // 邮箱验证函数
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    });
+
+
+    document.getElementById('submitBtn').addEventListener('click', submitForm);
+
+    function submitForm() {
+        const identityType = document.querySelector('input[name="identityType"]:checked').value;
+
+        // 根据身份类型获取正确的电话号码
+        const phone = identityType === 'STUDENT'
+            ? document.getElementById('studentPhone').value
+            : document.getElementById('companyPhone').value;
+
+        const formData = {
+            identityType: identityType,
+            username: document.getElementById('username').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            phone: phone, // 统一电话字段
+
+            // 学生信息
+            school: document.getElementById('school').value,
+            major: document.getElementById('major').value,
+            education: document.getElementById('education').value,
+
+            // 企业信息
+            companyName: document.getElementById('companyName').value,
+            companySize: document.getElementById('companySize').value,
+            contactPerson: document.getElementById('contactPerson').value
+        };
+
+        fetch('/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // 显示成功消息
+                    document.getElementById('step4').innerHTML = `
+                <div class="text-center py-5">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size:5rem"></i>
+                    <h2 class="my-4">注册成功!</h2>
+                    <p>您的账号 ${formData.username} 已创建</p>
+                    <div class="mt-4">
+                        <p>正在跳转到登录页面，<span id="countdown">5</span>秒后自动跳转...</p>
+                        <a href="/login" class="btn btn-primary mt-3">立即登录</a>
+                    </div>
+                </div>`;
+
+                    // 添加倒计时自动跳转
+                    let seconds = 3;
+                    const countdownElement = document.getElementById('countdown');
+                    const timer = setInterval(() => {
+                        seconds--;
+                        countdownElement.textContent = seconds;
+                        if (seconds <= 0) {
+                            clearInterval(timer);
+                            window.location.href = "/login"; // 跳转到登录页面
+                        }
+                    }, 1000);
+                } else {
+                    alert("注册失败: " + data.message);
+                    // 返回第一步让用户修改
+                    goToStep(1);
+                }
+            })
+            .catch(error => {
+                alert("请求失败: " + error.message);
+            });
+    }
+</script>
+</body>
+</html>

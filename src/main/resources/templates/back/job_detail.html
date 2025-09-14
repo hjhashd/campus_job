@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业职位管理系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            --border-radius: 10px;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #3c4b64;
+        }
+
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            box-shadow: var(--card-shadow);
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.8rem 1.5rem;
+            margin: 0.2rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .sidebar .nav-link i {
+            margin-right: 12px;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .sidebar .logo {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar .logo h4 {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .main-content {
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .dashboard-header {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .dashboard-header h1 {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .dashboard-header p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .admin-badge {
+            background: linear-gradient(120deg, #4361ee, #3a0ca3);
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card.border-primary::before {
+            background: var(--primary);
+        }
+
+        .stat-card.border-warning::before {
+            background: var(--warning);
+        }
+
+        .stat-card.border-success::before {
+            background: var(--success);
+        }
+
+        .stat-card.border-danger::before {
+            background: #dc3545;
+        }
+
+        .stat-card i {
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
+        }
+
+        .stat-card .card-title {
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card .display-6 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0;
+            color: #2c3e50;
+        }
+
+        .filter-section {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-section label {
+            font-weight: 500;
+            color: #495057;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .table-container {
+            background: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .table-header {
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eef2f7;
+            margin-bottom: 1.25rem;
+        }
+
+        table {
+            font-size: 0.95rem;
+            border-collapse: separate;
+            border-spacing: 0 0.75rem;
+        }
+
+        thead tr {
+            background: #f8fafc;
+        }
+
+        thead th {
+            font-weight: 600;
+            color: #4a5568;
+            padding: 1rem 1.25rem;
+            border-bottom: none;
+        }
+
+        tbody tr {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        tbody tr:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        tbody td {
+            padding: 1.1rem 1.25rem;
+            vertical-align: middle;
+            border-top: none;
+            border-bottom: none;
+        }
+
+        tbody td:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        tbody td:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .badge {
+            font-weight: 500;
+            padding: 0.45rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .badge-low-risk {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+        }
+
+        .badge-medium-risk {
+            background: rgba(255, 193, 7, 0.15);
+            color: #e6a000;
+        }
+
+        .badge-high-risk {
+            background: rgba(220, 53, 69, 0.15);
+            color: #dc3545;
+        }
+
+        .badge-full-time {
+            background: rgba(67, 97, 238, 0.15);
+            color: #4361ee;
+        }
+
+        .badge-part-time {
+            background: rgba(76, 201, 240, 0.15);
+            color: #4cc9f0;
+        }
+
+        .badge-internship {
+            background: rgba(247, 37, 133, 0.15);
+            color: #f72585;
+        }
+
+        .badge-remote {
+            background: rgba(72, 149, 239, 0.15);
+            color: #4895ef;
+        }
+
+        .action-btn {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+            border-radius: 6px;
+            box-shadow: none !important;
+        }
+
+        .action-btn:last-child {
+            margin-right: 0;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #eef2f7;
+        }
+
+        .page-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .pagination .page-item {
+            margin: 0 2px;
+        }
+
+        .pagination .page-link {
+            border-radius: 6px !important;
+            border: none;
+            min-width: 36px;
+            text-align: center;
+            color: #4a5568;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .pagination .page-link:hover {
+            background: #f1f5f9;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: var(--primary);
+            color: white;
+        }
+
+        .pagination .page-item.disabled .page-link {
+            color: #adb5bd;
+            box-shadow: none;
+        }
+
+        .modal-content {
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background: var(--primary);
+            color: white;
+            padding: 1.25rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .modal-footer {
+            background: #f8fafc;
+            padding: 1rem 1.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            color: #ced4da;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-top: 1rem;
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .risk-low { background-color: #28a745; }
+        .risk-medium { background-color: #ffc107; }
+        .risk-high { background-color: #dc3545; }
+
+        .salary-badge {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 992px) {
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+    <!-- 复用侧边栏 -->
+    <div class="flex-grow-1">
+        <div class="main-content">
+            <div class="dashboard-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1>职位详情</h1>
+                        <p class="mb-0" th:text="${job.title}"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">基本信息</h5>
+                    <div>
+                        <a th:href="@{'/admin/jobs/edit/' + ${job.jobId}}"
+                           class="btn btn-primary btn-sm me-2">
+                            <i class="bi bi-pencil"></i> 编辑
+                        </a>
+                        <button class="btn btn-danger btn-sm"
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteModal"
+                                th:data-jobid="${job.jobId}">
+                            <i class="bi bi-trash"></i> 删除
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">职位名称：</th>
+                                    <td th:text="${job.title}"></td>
+                                </tr>
+                                <tr>
+                                    <th>公司名称：</th>
+                                    <td th:text="${job.companyName}"></td>
+                                </tr>
+                                <tr>
+                                    <th>职位类型：</th>
+                                    <td>
+                                       <span th:switch="${job.jobType}">
+    <span th:case="'FULL_TIME'" class="badge badge-full-time">全职</span>
+    <span th:case="'PART_TIME'" class="badge badge-part-time">兼职</span>
+    <span th:case="'INTERNSHIP'" class="badge badge-internship">实习</span>
+    <span th:case="'REMOTE'" class="badge badge-remote">远程</span>
+</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>风险等级：</th>
+                                    <td>
+                                        <span th:switch="${job.riskLevel}">
+                                            <span th:case="'LOW'" class="badge badge-low-risk">低风险</span>
+                                            <!-- 其他等级 -->
+                                        </span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">薪资范围：</th>
+                                    <td th:text="${job.salaryRange}"></td>
+                                </tr>
+                                <tr>
+                                    <th>工作地点：</th>
+                                    <td th:text="${job.location}"></td>
+                                </tr>
+                                <tr>
+                                    <th>经验要求：</th>
+                                    <td th:text="${job.experienceRequirement}"></td>
+                                </tr>
+                                <tr>
+                                    <th>学历要求：</th>
+                                    <td th:text="${job.educationRequirement}"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">职位描述</h5>
+                </div>
+                <div class="card-body">
+                    <div th:utext="${#strings.replace(job.description, '__newline__', '&lt;br&gt;')}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 删除职位模态框 -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-exclamation-triangle me-2"></i> 确认删除</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除这个职位吗？此操作不可恢复。</p>
+                <p class="text-danger"><strong>警告：</strong> 删除职位后，所有相关的申请记录也将被删除。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <form id="deleteForm" method="post" th:action="@{'/admin/jobs/' + ${job.jobId}}">
+                    <input type="hidden" name="_method" value="delete">
+                    <button type="submit" class="btn btn-danger">确认删除</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

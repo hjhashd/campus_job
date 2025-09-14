@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>校园招聘 - 聊天</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .chat-container {
+            max-width: 800px;
+            margin: 20px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            background: white;
+        }
+        .chat-header {
+            padding: 15px 20px;
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .job-info {
+            background: #e3f2fd;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 15px;
+            max-width: 80%;
+        }
+        .user-message {
+            margin-left: auto;
+            background: #3498db;
+            color: white;
+            border-radius: 15px 15px 0 15px;
+            padding: 10px 15px;
+        }
+        .company-message {
+            margin-right: auto;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 15px 15px 15px 0;
+            padding: 10px 15px;
+        }
+        .message-time {
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #e9ecef;
+        }
+        .chat-input input {
+            flex: 1;
+            border-radius: 20px;
+            padding: 10px 15px;
+            border: 1px solid #e9ecef;
+        }
+        .chat-input button {
+            margin-left: 10px;
+            border-radius: 20px;
+            padding: 8px 20px;
+        }
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <!-- 导航栏 -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>校园招聘平台
+            </a>
+            <div class="d-flex align-items-center">
+                <div class="text-white me-3">
+                    <i class="fas fa-user me-1"></i>
+                    <span th:text="${currentUser.username}">用户姓名</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 聊天容器 -->
+    <div class="chat-container">
+        <!-- 修改聊天头部显示 -->
+        <div class="chat-header">
+            <div>
+                <!-- 显示对方名称 -->
+                <span th:if="${currentUser.userType.name() == 'STUDENT'}"
+                      th:text="${job.companyName}">公司名称</span>
+                <span th:if="${currentUser.userType.name() == 'COMPANY'}"
+                      th:text="${conversation.studentName}">学生姓名</span>
+            </div>
+            <div class="text-white-50" th:text="'职位: ' + ${job.title}"></div>
+        </div>
+
+        <!-- 修改消息发送者显示 -->
+        <div class="message-sender"
+             th:if="${message.senderId == currentUser.userId}">
+            我
+        </div>
+        <div class="message-sender"
+             th:if="${message.senderId != currentUser.userId}">
+    <span th:if="${currentUser.userType.name() == 'STUDENT'}"
+          th:text="${job.companyName}">公司</span>
+            <span th:if="${currentUser.userType.name() == 'COMPANY'}"
+                  th:text="${conversation.studentName}">学生</span>
+        </div>
+
+        <div class="job-info">
+            <h5 class="mb-1" th:text="${job.title}">职位标题</h5>
+            <div class="d-flex justify-content-between">
+                <span th:text="${job.companyName}">公司名称</span>
+                <span class="text-danger fw-bold" th:text="${job.salaryRange}">薪资范围</span>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div th:each="message : ${messages}" class="message"
+                 th:classappend="${message.senderId == currentUser.userId} ? 'user-message' : 'company-message'">
+                <div class="message-sender"
+                     th:text="${message.senderId == currentUser.userId} ?
+                         '我' : ${currentUser.userType == 'STUDENT' ? job.companyName : conversation.studentName}">
+                </div>
+                <div th:text="${message.content}">消息内容</div>
+                <div class="message-time">
+                    <span th:text="${#temporals.format(message.sentAt, 'yyyy-MM-dd HH:mm')}">时间</span>
+                </div>
+            </div>
+
+            <div th:if="${messages == null or messages.isEmpty()}" class="text-center text-muted py-5">
+                <i class="fas fa-comment-slash fa-2x mb-3"></i>
+                <p>还没有消息，开始对话吧！</p>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <form th:action="@{/messages/send}" method="post" id="messageForm">
+                <input type="hidden" name="conversationId" th:value="${conversationId}">
+                <div class="d-flex">
+                    <input type="text" name="content" class="form-control"
+                           placeholder="输入消息..." autocomplete="off" id="messageInput">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-1"></i> 发送
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 页面加载时滚动到底部
+    document.addEventListener('DOMContentLoaded', function() {
+        scrollToBottom();
+    });
+
+    // 滚动到消息底部
+    function scrollToBottom() {
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages) {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+    }
+
+    // 表单提交处理
+    const messageForm = document.getElementById('messageForm');
+    if (messageForm) {
+        messageForm.addEventListener('submit', function(e) {
+            const input = document.getElementById('messageInput');
+            if (input.value.trim() === '') {
+                e.preventDefault();
+                return;
+            }
+        });
+    }
+</script>
+</body>
+</html>
