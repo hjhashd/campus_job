@@ -1,269 +1,874 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>混合UI库解决方案</title>
-  
-  <!-- 引入 Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  
-  <!-- 引入 Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      important: '#tailwind-container',
-      corePlugins: {
-        preflight: false, // 禁用默认样式重置
-      }
-    }
-  </script>
-  
+  <title>用户管理系统</title>
+  <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.css">
   <style>
-    /* 全局样式 */
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --success: #06d6a0;
+      --info: #118ab2;
+      --warning: #ffd166;
+      --danger: #ef476f;
+      --light-bg: #f5f7fb;
+      --dark-bg: #212529;
+      --sidebar-bg: linear-gradient(180deg, #4361ee 0%, #3f37c9 100%);
+      --sidebar-hover: rgba(255, 255, 255, 0.1);
+    }
+
     body {
-      font-family: 'Segoe UI', system-ui, sans-serif;
-      background-color: #f8f9fa;
-      padding: 20px;
-      transition: background-color 0.3s;
-    }
-    
-    /* 组件容器 */
-    .ui-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-      background: white;
-      transition: all 0.3s;
-    }
-    
-    /* 切换控件 */
-    .ui-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      z-index: 1000;
-      background: white;
-      border-radius: 50px;
-      padding: 8px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      background-color: var(--light-bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
       display: flex;
     }
-    
-    .ui-toggle button {
-      padding: 8px 16px;
-      border: none;
+
+    /* 新版导航栏样式 */
+    .sidebar {
+      min-height: 100vh;
+      background: var(--sidebar-bg);
+      color: white;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      width: 250px;
+      position: sticky;
+      top: 0;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      padding: 1.5rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 1rem;
+    }
+
+    .logo h4 {
+      color: white;
+      font-weight: 700;
+      text-align: center;
+      margin: 0;
+    }
+
+    .nav-link {
+      color: rgba(255, 255, 255, 0.85);
+      padding: 0.8rem 1.5rem;
+      margin: 0.2rem 0.5rem;
+      border-radius: 5px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: var(--sidebar-hover);
+      color: white;
+    }
+
+    .nav-link i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+      transition: transform 0.3s;
+    }
+
+    .nav-link:hover i {
+      transform: scale(1.1);
+    }
+
+    /* 主内容区域 */
+    .main-content {
+      flex: 1;
+      padding: 25px;
+      overflow-x: hidden;
+    }
+
+    .header-container {
+      background: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .page-title {
+      color: var(--primary);
+      font-weight: 700;
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      background: rgba(67, 97, 238, 0.1);
+      padding: 8px 15px;
       border-radius: 50px;
-      cursor: pointer;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+      border: 2px solid var(--primary);
+    }
+
+    .user-info div {
+      line-height: 1.3;
+    }
+
+    .user-info .fw-bold {
+      font-size: 0.9rem;
+      color: var(--dark-bg);
+    }
+
+    .user-info .small {
+      font-size: 0.75rem;
+      color: var(--secondary);
+    }
+
+    /* 统计卡片 */
+    .stats-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: var(--dark-bg);
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e2e5ec;
+    }
+
+    .stat-card {
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 20px;
+      transition: transform 0.3s, box-shadow 0.3s;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      height: 100%;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-card .card-body {
+      padding: 20px;
+    }
+
+    .stat-card .text-xs {
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .stat-card .h5 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0;
+    }
+
+    .stat-card .col-auto {
+      font-size: 2.2rem;
+      opacity: 0.8;
+    }
+
+    .stat-card.total {
+      background: linear-gradient(45deg, #4361ee, #4895ef);
+      color: white;
+    }
+    .stat-card.active {
+      background: linear-gradient(45deg, #06d6a0, #4cc9f0);
+      color: white;
+    }
+    .stat-card.inactive {
+      background: linear-gradient(45deg, #ef476f, #f15bb5);
+      color: white;
+    }
+    .stat-card.students {
+      background: linear-gradient(45deg, #118ab2, #07beb8);
+      color: white;
+    }
+    .stat-card.companies {
+      background: linear-gradient(45deg, #ffd166, #ff9e00);
+      color: white;
+    }
+    .stat-card.admins {
+      background: linear-gradient(45deg, #7209b7, #3a0ca3);
+      color: white;
+    }
+
+    /* 搜索区域 */
+    .search-container {
+      background-color: white;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+      margin-bottom: 25px;
+    }
+
+    .form-label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: var(--dark-bg);
+      margin-bottom: 8px;
+    }
+
+    .form-select, .form-control {
+      border-radius: 8px;
+      font-size: 0.9rem;
+      height: calc(1.5em + 1rem + 2px);
+      border: 1px solid #e2e5ec;
+    }
+
+    .form-select:focus, .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.25);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
       font-weight: 600;
       transition: all 0.3s;
     }
-    
-    .ui-toggle .active {
-      background: #4f46e5;
+
+    .btn-primary:hover {
+      background: #3651d4;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+    }
+
+    /* 表格区域 */
+    .card {
+      border-radius: 10px;
+      border: none;
+      box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.1);
+      margin-bottom: 25px;
+    }
+
+    .card-header {
+      background-color: white;
+      border-bottom: 1px solid #e2e5ec;
+      padding: 15px 20px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--dark-bg);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-responsive {
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .table {
+      margin-bottom: 0;
+      font-size: 0.9rem;
+    }
+
+    .table th {
+      background-color: #f6f9ff;
+      color: var(--primary);
+      font-weight: 700;
+      padding: 15px;
+      border-bottom: 2px solid #e2e5ec;
+    }
+
+    .table td {
+      vertical-align: middle;
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f2f5;
+    }
+
+    .table tbody tr:hover {
+      background-color: rgba(67, 97, 238, 0.03);
+    }
+
+    .status-badge {
+      padding: 0.4em 1em;
+      border-radius: 50px;
+      font-size: 0.85em;
+      font-weight: 600;
+    }
+
+    .badge-active {
+      background-color: rgba(6, 214, 160, 0.15);
+      color: #06b48c;
+    }
+
+    .badge-inactive {
+      background-color: rgba(239, 71, 111, 0.15);
+      color: #e62a5c;
+    }
+
+    .identity-badge {
+      background-color: rgba(67, 97, 238, 0.15);
+      color: var(--primary);
+    }
+
+    .user-avatar-table {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 12px;
+      border: 1px solid #e2e5ec;
+    }
+
+    /* 操作按钮 */
+    .btn-action {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-info {
+      background: rgba(17, 138, 178, 0.1);
+      color: var(--info);
+      border: none;
+    }
+
+    .btn-info:hover {
+      background: var(--info);
       color: white;
     }
-    
-    /* Bootstrap 容器样式 */
-    #bootstrap-container {
-      --primary-color: #0d6efd;
-      --success-color: #198754;
-      --warning-color: #ffc107;
-      --danger-color: #dc3545;
+
+    .btn-warning {
+      background: rgba(255, 209, 102, 0.15);
+      color: #e6b325;
+      border: none;
     }
-    
-    /* Tailwind 容器样式 */
-    #tailwind-container {
-      --primary-color: #4f46e5;
-      --success-color: #10b981;
-      --warning-color: #f59e0b;
-      --danger-color: #ef4444;
+
+    .btn-warning:hover {
+      background: #e6b325;
+      color: white;
     }
-    
-    /* 隔离 Bootstrap 样式 */
-    #bootstrap-container {
-      /* 覆盖 Tailwind 在容器内的样式 */
-      button, input, .btn, .form-control {
-        all: unset;
-      }
+
+    .btn-danger {
+      background: rgba(239, 71, 111, 0.1);
+      color: var(--danger);
+      border: none;
     }
-    
-    /* 隔离 Tailwind 样式 */
-    #tailwind-container {
-      /* 覆盖 Bootstrap 在容器内的样式 */
-      .btn, .form-control {
-        all: unset;
-      }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
     }
-    
-    /* 自定义组件样式 */
-    .custom-component {
-      margin: 30px 0;
-      padding: 25px;
-      border-radius: 12px;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
+
+    /* 分页 */
+    .pagination {
+      margin-top: 20px;
     }
-    
-    .component-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid;
+
+    .page-item .page-link {
+      border-radius: 8px;
+      margin: 0 4px;
+      border: none;
+      color: var(--secondary);
+      font-weight: 600;
     }
-    
+
+    .page-item.active .page-link {
+      background: var(--primary);
+      color: white;
+    }
+
+    .page-item.disabled .page-link {
+      color: #adb5bd;
+    }
+
+    .page-item:not(.active):not(.disabled) .page-link:hover {
+      background: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+
+    /* 页大小选择器 */
+    .page-size-selector {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .page-size-selector span {
+      margin-right: 10px;
+      font-size: 0.9rem;
+      color: var(--secondary);
+    }
+
+    .page-size-selector select {
+      width: 80px;
+      border-radius: 8px;
+      border: 1px solid #e2e5ec;
+      padding: 5px 10px;
+    }
+
+    /* 无数据提示 */
+    .no-data {
+      padding: 40px 0;
+      text-align: center;
+      color: var(--secondary);
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
     /* 响应式调整 */
-    @media (max-width: 768px) {
-      .ui-toggle {
-        top: 10px;
-        right: 10px;
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 80px;
+        padding: 20px 5px;
       }
-      .ui-toggle button {
-        padding: 6px 12px;
-        font-size: 0.9rem;
+      .logo h4 {
+        font-size: 0;
+      }
+      .logo h4:after {
+        content: "系统";
+        font-size: 1.2rem;
+      }
+      .nav-link span {
+        display: none;
+      }
+      .nav-link i {
+        margin-right: 0;
+        font-size: 1.3rem;
       }
     }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        min-height: auto;
+        position: relative;
+        padding: 10px 0;
+      }
+
+      .nav {
+        flex-direction: row !important;
+        overflow-x: auto;
+        padding: 5px 0;
+      }
+
+      .nav-item {
+        flex-shrink: 0;
+      }
+
+      .nav-link {
+        margin: 0 5px;
+        padding: 10px 15px;
+      }
+
+      .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .user-info {
+        margin-top: 15px;
+      }
+    }
+
+    /* 添加下拉菜单样式 */
+    .dropdown-menu {
+      border-radius: 8px;
+      box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+      border: none;
+      padding: 0.5rem;
+      min-width: 200px;
+    }
+    .dropdown-item {
+      padding: 0.75rem 1rem;
+      border-radius: 5px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+    }
+    .dropdown-item:hover {
+      background-color: rgba(67, 97, 238, 0.1);
+    }
+    .dropdown-item i {
+      margin-right: 10px;
+      width: 18px;
+      text-align: center;
+    }
+    .dropdown-divider {
+      margin: 0.5rem 0;
+    }
+
   </style>
 </head>
 <body>
-  <!-- UI库切换控件 -->
-  <div class="ui-toggle">
-    <button id="bootstrap-toggle" class="active">Bootstrap</button>
-    <button id="tailwind-toggle">Tailwind CSS</button>
+<div class="sidebar">
+  <div class="logo">
+    <h4><i class="bi bi-person-badge me-2"></i>企业职位系统</h4>
   </div>
+  <ul class="nav flex-column mt-4">
+    <li class="nav-item">
+      <a class="nav-link " href="/dashboard">
+        <i class="bi bi-speedometer2"></i> 控制台
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active" href="/admin/users/list">
+        <i class="bi bi-people"></i> 用户管理
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/admin/jobs">
+        <i class="bi bi-building"></i> 职业管理
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/admin/auth/list">
+        <i class="bi bi-shield-check"></i> 认证审核
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="/admin/account">
+        <i class="bi bi-gear"></i> 账户设置
+      </a>
+    </li>
+  </ul>
+</div>
 
-  <!-- 主容器 -->
-  <div class="ui-container">
-    <h1 class="text-3xl font-bold mb-6 text-center">混合UI库解决方案</h1>
-    <p class="text-center text-gray-600 mb-10">此页面展示了如何在同一项目中混合使用Bootstrap和Tailwind CSS</p>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-      <!-- Bootstrap组件容器 -->
-      <div id="bootstrap-container" class="custom-component">
-        <h2 class="component-title" style="border-color: var(--primary-color); color: var(--primary-color);">
-          Bootstrap 组件
-        </h2>
-        
-        <div class="mb-4">
-          <button class="btn btn-primary me-2">主要按钮</button>
-          <button class="btn btn-success me-2">成功按钮</button>
-          <button class="btn btn-warning me-2">警告按钮</button>
-          <button class="btn btn-danger">危险按钮</button>
+<div class="main-content">
+  <div class="header-container">
+    <h1 class="page-title">用户管理系统</h1>
+    <!-- 修改用户信息区域为下拉菜单 -->
+    <div class="dropdown">
+      <a class="user-info dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <div>
+          <div class="fw-bold">管理员</div>
         </div>
-        
-        <div class="alert alert-primary mt-4">
-          这是一个Bootstrap警告框 - 使用Bootstrap样式
-        </div>
-        
-        <div class="form-group mt-4">
-          <label class="form-label">输入框示例</label>
-          <input type="text" class="form-control" placeholder="使用Bootstrap表单控件">
-        </div>
-        
-        <div class="card mt-4">
-          <div class="card-body">
-            <h5 class="card-title">Bootstrap卡片</h5>
-            <p class="card-text">这是一个使用Bootstrap样式的卡片组件。</p>
-            <a href="#" class="btn btn-primary">卡片按钮</a>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Tailwind组件容器 -->
-      <div id="tailwind-container" class="custom-component">
-        <h2 class="component-title" style="border-color: var(--primary-color); color: var(--primary-color);">
-          Tailwind CSS 组件
-        </h2>
-        
-        <div class="mb-4">
-          <button class="bg-[var(--primary-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded mr-2">
-            主要按钮
-          </button>
-          <button class="bg-[var(--success-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded mr-2">
-            成功按钮
-          </button>
-          <button class="bg-[var(--warning-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded mr-2">
-            警告按钮
-          </button>
-          <button class="bg-[var(--danger-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded">
-            危险按钮
-          </button>
-        </div>
-        
-        <div class="bg-[var(--primary-color)] bg-opacity-10 border-l-4 border-[var(--primary-color)] text-[var(--primary-color)] p-4 mt-4 rounded">
-          <p>这是一个Tailwind CSS警告框 - 使用Tailwind样式</p>
-        </div>
-        
-        <div class="mt-4">
-          <label class="block text-gray-700 text-sm font-bold mb-2">输入框示例</label>
-          <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
-                 type="text" placeholder="使用Tailwind表单控件">
-        </div>
-        
-        <div class="max-w-sm rounded overflow-hidden shadow-lg mt-4">
-          <div class="px-6 py-4">
-            <div class="font-bold text-xl mb-2">Tailwind卡片</div>
-            <p class="text-gray-700 text-base">
-              这是一个使用Tailwind CSS样式的卡片组件。
-            </p>
-          </div>
-          <div class="px-6 pt-4 pb-2">
-            <button class="bg-[var(--primary-color)] hover:opacity-90 text-white font-bold py-2 px-4 rounded">
-              卡片按钮
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <div class="mt-12 p-6 bg-gray-50 rounded-xl">
-      <h2 class="text-xl font-semibold mb-4">实现说明</h2>
-      <ul class="list-disc pl-6 space-y-2">
-        <li>通过CSS变量统一主题颜色</li>
-        <li>使用ID选择器隔离不同UI库的样式作用域</li>
-        <li>在Tailwind配置中设置<code>important: '#tailwind-container'</code>限制作用范围</li>
-        <li>使用<code>all: unset</code>重置元素在特定容器内的样式</li>
-        <li>通过JavaScript动态切换UI库显示</li>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <li><a class="dropdown-item" href="/">
+          <i class="bi bi-house-door"></i> 回到首页
+        </a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="/logout">
+          <i class="bi bi-box-arrow-right"></i> 退出登录
+        </a></li>
       </ul>
     </div>
   </div>
 
-  <script>
-    // 切换UI库
-    const toggleBootstrap = document.getElementById('bootstrap-toggle');
-    const toggleTailwind = document.getElementById('tailwind-toggle');
-    const bootstrapContainer = document.getElementById('bootstrap-container');
-    const tailwindContainer = document.getElementById('tailwind-container');
-    
-    // 初始化状态
-    let activeUI = 'bootstrap';
-    
-    // 切换函数
-    function setActiveUI(ui) {
-      activeUI = ui;
-      
-      if (ui === 'bootstrap') {
-        toggleBootstrap.classList.add('active');
-        toggleTailwind.classList.remove('active');
-        bootstrapContainer.style.display = 'block';
-        tailwindContainer.style.display = 'none';
-      } else {
-        toggleBootstrap.classList.remove('active');
-        toggleTailwind.classList.add('active');
-        bootstrapContainer.style.display = 'none';
-        tailwindContainer.style.display = 'block';
-      }
-    }
-    
-    // 事件监听
-    toggleBootstrap.addEventListener('click', () => setActiveUI('bootstrap'));
-    toggleTailwind.addEventListener('click', () => setActiveUI('tailwind'));
-    
-    // 初始化显示
-    setActiveUI('bootstrap');
-  </script>
+  <!-- 统计卡片 -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <h5 class="stats-title">用户统计概览</h5>
+    </div>
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+      <div class="card stat-card total h-100">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-uppercase mb-1">总用户数</div>
+              <div class="h5 mb-0 fw-bold" th:text="${stats.total}">0</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-people-fill" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+      <div class="card stat-card active h-100">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-uppercase mb-1">活跃用户</div>
+              <div class="h5 mb-0 fw-bold" th:text="${stats.active}">0</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-person-check-fill" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+      <div class="card stat-card inactive h-100">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-uppercase mb-1">非活跃用户</div>
+              <div class="h5 mb-0 fw-bold" th:text="${stats.inactive}">0</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-person-x-fill" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+      <div class="card stat-card students h-100">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-uppercase mb-1">学生用户</div>
+              <div class="h5 mb-0 fw-bold" th:text="${stats.students}">0</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-mortarboard-fill" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+      <div class="card stat-card companies h-100">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-uppercase mb-1">企业用户</div>
+              <div class="h5 mb-0 fw-bold" th:text="${stats.companies}">0</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-building-fill" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-2 col-md-4 col-sm-6 mb-4">
+      <div class="card stat-card admins h-100">
+        <div class="card-body">
+          <div class="row align-items-center">
+            <div class="col">
+              <div class="text-xs fw-bold text-uppercase mb-1">管理员</div>
+              <div class="h5 mb-0 fw-bold" th:text="${stats.admins}">0</div>
+            </div>
+            <div class="col-auto">
+              <i class="bi bi-shield-fill-check" style="font-size: 2rem;"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 搜索表单 -->
+  <div class="search-container">
+    <form th:action="@{/admin/users/list}" method="get">
+      <div class="row g-3">
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label">身份类型</label>
+          <select class="form-select" name="identityType">
+            <option value="">全部类型</option>
+            <option value="STUDENT" th:selected="${identityType == 'STUDENT'}">学生</option>
+            <option value="COMPANY" th:selected="${identityType == 'COMPANY'}">企业</option>
+            <option value="ADMIN" th:selected="${identityType == 'ADMIN'}">管理员</option>
+          </select>
+        </div>
+
+        <div class="col-lg-3 col-md-6">
+          <label class="form-label">用户状态</label>
+          <select class="form-select" name="status">
+            <option value="">全部状态</option>
+            <option value="ACTIVE" th:selected="${status == 'ACTIVE'}">活跃</option>
+            <option value="INACTIVE" th:selected="${status == 'INACTIVE'}">非活跃</option>
+          </select>
+        </div>
+
+        <div class="col-lg-4 col-md-8">
+          <label class="form-label">关键词搜索</label>
+          <input type="text" class="form-control" name="search" placeholder="用户名/邮箱/电话/公司" th:value="${search}">
+        </div>
+
+        <div class="col-lg-2 col-md-4 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-search me-1"></i> 搜索
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- 用户列表 -->
+  <div class="card shadow mb-4">
+    <div class="card-header">
+      <h6 class="m-0 fw-bold">用户列表</h6>
+      <span class="text-muted" th:text="'共 ' + ${totalItems} + ' 条记录'"></span>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>用户名</th>
+            <th>身份类型</th>
+            <th>邮箱</th>
+            <th>电话</th>
+            <th>状态</th>
+            <th>注册时间</th>
+            <th>操作</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="user : ${users}">
+            <td th:text="${user.userId}">1</td>
+            <td>
+              <div class="d-flex align-items-center">
+                <span th:text="${user.username}">admin</span>
+              </div>
+            </td>
+            <td>
+                            <span class="badge identity-badge status-badge"
+                                  th:text="${user.identityType == 'STUDENT'} ? '学生' :
+                                            (${user.identityType == 'COMPANY'} ? '企业' : '管理员')">
+                                身份
+                            </span>
+            </td>
+            <td th:text="${user.email}">admin@example.com</td>
+            <td th:text="${user.phone ?: 'N/A'}">13800138000</td>
+            <td>
+    <span class="badge status-badge"
+          th:classappend="${user.status} == 1 ? 'badge-active' : 'badge-inactive'"
+          th:text="${user.status} == 1 ? '活跃' : '非活跃'">
+        状态
+    </span>
+            </td>
+            <td th:if="${user.createdAt != null}"
+                th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">
+              2023-01-01
+            </td>
+            <td>
+              <div class="d-flex gap-2">
+                <a th:href="@{/admin/users/{userId}(userId=${user.userId}, identityType=${identityType}, status=${status}, search=${search})}"
+                   class="btn btn-sm btn-info btn-action">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <!-- 状态切换按钮 -->
+                <form th:action="@{/admin/users/{userId}/toggle-status(userId=${user.userId})}"
+                      th:method="post">
+                  <button type="submit" class="btn btn-sm btn-warning btn-action">
+                    <i class="bi"
+                       th:classappend="${user.status} == 1 ? 'bi-toggle-off' : 'bi-toggle-on'"></i>
+                  </button>
+                </form>
+                <form th:action="@{/admin/users/{userId}/delete(userId=${user.userId})}"
+                      th:method="post">
+                  <input type="hidden" name="identityType" th:value="${identityType}">
+                  <input type="hidden" name="status" th:value="${status}">
+                  <input type="hidden" name="search" th:value="${search}">
+                  <button type="submit" class="btn btn-sm btn-danger btn-action"
+                          onclick="return confirm('确定要删除这个用户吗？');">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          <tr th:if="${#lists.isEmpty(users)}">
+            <td colspan="8" class="no-data">没有找到匹配的用户</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 分页控件 -->
+      <nav th:if="${totalPages > 1}">
+        <ul class="pagination justify-content-center">
+          <!-- 上一页 -->
+          <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{${'/admin/users/list?page=' + (currentPage - 1) + '&size=' + pageSize
+                                          + (identityType != null ? '&identityType=' + identityType : '')
+                                          + (status != null ? '&status=' + status : '')
+                                          + (search != null ? '&search=' + search : '')}}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+
+          <!-- 页码 -->
+          <li class="page-item" th:each="page : ${#numbers.sequence(1, totalPages)}"
+              th:classappend="${page == currentPage} ? 'active'">
+            <a class="page-link"
+               th:href="@{${'/admin/users/list?page=' + page + '&size=' + pageSize
+                                          + (identityType != null ? '&identityType=' + identityType : '')
+                                          + (status != null ? '&status=' + status : '')
+                                          + (search != null ? '&search=' + search : '')}}"
+               th:text="${page}">1</a>
+          </li>
+
+          <!-- 下一页 -->
+          <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+            <a class="page-link"
+               th:href="@{${'/admin/users/list?page=' + (currentPage + 1) + '&size=' + pageSize
+                                          + (identityType != null ? '&identityType=' + identityType : '')
+                                          + (status != null ? '&status=' + status : '')
+                                          + (search != null ? '&search=' + search : '')}}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- 每页大小选择 -->
+      <div class="d-flex justify-content-end align-items-center mt-3">
+        <span class="me-2">每页显示:</span>
+        <select class="form-select form-select-sm w-auto" onchange="changePageSize(this)">
+          <option value="10" th:selected="${pageSize == 10}">10</option>
+          <option value="25" th:selected="${pageSize == 25}">25</option>
+          <option value="50" th:selected="${pageSize == 50}">50</option>
+          <option value="100" th:selected="${pageSize == 100}">100</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 无结果提示 -->
+<div th:if="${totalItems == 0}" class="alert alert-info mt-4">
+  <i class="fas fa-info-circle"></i> 未找到匹配的用户
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  function changePageSize(select) {
+    const pageSize = select.value;
+    let url = `/admin/users/list?page=1&size=${pageSize}`;
+
+    // 添加筛选参数
+    const identityType = "[[${identityType}]]";
+    const status = "[[${status}]]";
+    const search = "[[${search}]]";
+
+    if (identityType && identityType !== 'null') url += `&identityType=${identityType}`;
+    if (status && status !== 'null') url += `&status=${status}`;
+    if (search && search !== 'null') url += `&search=${search}`;
+
+    window.location.href = url;
+  }
+</script>
 </body>
 </html>
