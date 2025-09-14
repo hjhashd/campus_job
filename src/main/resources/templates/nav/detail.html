@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title th:text="${job.title} + ' - 职位详情'">职位详情</title>
-    <link href="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 使用国内镜像源 -->
+    <link href="https://cdn.bootcss.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --primary: #3498db;
@@ -32,6 +33,7 @@
             background-color: #f5f7fa;
             color: #34495e;
             line-height: 1.6;
+            padding-bottom: 2rem;
         }
 
         .container {
@@ -437,6 +439,28 @@
         .job-description { animation-delay: 0.3s; }
         .review-card { animation-delay: 0.4s; }
         .similar-jobs-section { animation-delay: 0.5s; }
+
+        /* 操作按钮区域 */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-lg {
+            padding: 0.9rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+        }
     </style>
 </head>
 <body>
@@ -460,6 +484,18 @@
             <div class="info-item"><i class="fas fa-map-marker-alt"></i> <span th:text="${job.location}">北京市海淀区中关村软件园</span></div>
             <div class="info-item"><i class="fas fa-briefcase"></i> 经验: <span th:text="${job.experienceRequirement}">3-5年</span></div>
             <div class="info-item"><i class="fas fa-graduation-cap"></i> 学历: <span th:text="${job.educationRequirement}">本科及以上</span></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-primary btn-lg">
+                <i class="fas fa-paper-plane me-2"></i>立即投递
+            </button>
+            <button class="btn btn-outline-primary btn-lg">
+                <i class="fas fa-heart me-2"></i>收藏职位
+            </button>
+            <button class="btn btn-success btn-lg">
+                <i class="fas fa-phone-alt me-2"></i>联系HR
+            </button>
         </div>
     </div>
 
@@ -545,7 +581,7 @@
     </div>
 </div>
 
-<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script>
     // 添加简单的交互效果
     document.querySelectorAll('.custom-badge').forEach(badge => {
@@ -566,6 +602,16 @@
 
         card.addEventListener('mouseleave', function() {
             this.style.transform = 'translateY(0)';
+        });
+    });
+
+    // 按钮点击效果
+    document.querySelectorAll('.btn').forEach(button => {
+        button.addEventListener('click', function() {
+            this.classList.add('active');
+            setTimeout(() => {
+                this.classList.remove('active');
+            }, 300);
         });
     });
 </script>

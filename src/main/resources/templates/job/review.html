@@ -419,7 +419,8 @@
                         <div class="avatar" th:text="${#strings.substring(review.username, 0, 1)}">张</div>
                         <div class="reviewer-details">
                             <div class="reviewer-name" th:text="${review.username}">用户名</div>
-                            <div class="review-date" th:text="${#dates.format(review.createdAt, 'yyyy年MM月dd日')}">2023年8月15日</div>
+                            <!-- 错误修正：使用 #temporals 替代 #dates -->
+                            <div class="review-date" th:text="${#temporals.format(review.createdAt, 'yyyy年MM月dd日')}">2023年8月15日</div>
                         </div>
                     </div>
 

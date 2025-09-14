@@ -2,7 +2,9 @@
 
 <div align="center">
 
-![图片占位符 - 系统Logo](./docs/images/logo.png)
+![285ac81d53f18878ace3cd9e61afa44b](https://github.com/user-attachments/assets/e0495e5f-e11a-4bd8-a35b-26a26e096951)
+
+
 
 *专为大学生和企业打造的校园招聘求职管理平台*
 
@@ -19,7 +21,8 @@
 
 校园求职管理系统是一个专为大学生和企业设计的在线招聘管理平台，致力于搭建校园人才与优质企业之间的桥梁。系统提供了完整的招聘求职流程管理，包括职位发布、简历投递、面试安排、人才筛选、消息沟通等全方位功能。
 
-![Uploading 屏幕截图 2025-06-19 233339.png…]()
+<img width="2558" height="1409" alt="屏幕截图 2025-06-19 233339" src="https://github.com/user-attachments/assets/a96bc721-80d9-4149-adb7-9f85c6e57cda" />
+
 
 
 ## ✨ 核心功能
@@ -39,6 +42,7 @@
 - **职位搜索** - 多维度筛选和智能搜索
 - **职位详情** - 详细的职位描述和要求展示
 - **职位管理** - 企业职位状态管理后台
+  <img width="2541" height="1386" alt="屏幕截图 2025-06-19 233536" src="https://github.com/user-attachments/assets/249fe284-7ef0-49a3-9750-c1e5d4121ab0" />
 
 <img width="2559" height="1383" alt="image" src="https://github.com/user-attachments/assets/77d9c531-eddd-4369-8043-65b23630365a" />
 
@@ -49,36 +53,32 @@
 - **投递记录** - 查看投递状态和企业反馈
 - **简历筛选** - 企业HR筛选合适人才
 
-![图片占位符 - 简历投递界面](./docs/images/resume-apply.png)
+<img width="2559" height="1390" alt="屏幕截图 2025-06-19 061555" src="https://github.com/user-attachments/assets/5112e117-1156-4500-98b0-c16206ca4a12" />
 
-### 💬 消息沟通模块
-- **即时消息** - 求职者与HR实时沟通
-- **会话管理** - 统一的消息会话管理
-- **消息中心** - 重要消息集中展示
-- **通知提醒** - 实时消息推送和提醒
-
-![图片占位符 - 消息沟通界面](./docs/images/message-interface.png)
 
 ### 🎯 人才中心模块
 - **人才展示** - 优秀求职者技能展示
 - **智能推荐** - 基于技能的职位匹配
 - **求职状态** - 求职进度实时跟踪
 - **职业指导** - 求职建议和职业规划
+  <img width="2558" height="1393" alt="image" src="https://github.com/user-attachments/assets/025b3772-1c0b-4fc3-ad94-00abd87f1c37" />
+  <img width="2559" height="1391" alt="image" src="https://github.com/user-attachments/assets/2642571d-7340-4978-adfe-d651cc399db6" />
 
-![图片占位符 - 人才中心界面](./docs/images/talent-center.png)
 
 ### 🔍 职位评价模块
 - **职位评价** - 求职者对职位和企业的评价
 - **评价管理** - 评价内容的审核和管理
 - **评价统计** - 企业和职位的评价数据分析
 
-![图片占位符 - 职位评价界面](./docs/images/job-review.png)
+<img width="2548" height="1399" alt="屏幕截图 2025-06-19 233430" src="https://github.com/user-attachments/assets/6588cbe7-e06e-43db-980e-c99da5cf8bca" />
+
 
 ### 🛡️ 企业认证模块
 - **认证申请** - 企业提交认证申请
 - **资质审核** - 管理员审核企业资质
 - **认证管理** - 认证状态跟踪和管理
 - **权限控制** - 基于认证状态的功能权限
+  <img width="2543" height="1382" alt="屏幕截图 2025-06-19 233522" src="https://github.com/user-attachments/assets/74ab84aa-cab5-4c3d-aee5-546f13bc7560" />
 
 <img width="2559" height="1397" alt="image" src="https://github.com/user-attachments/assets/d8417001-0fbe-4c35-a311-9852fc4f60da" />
 
@@ -89,11 +89,10 @@
 - **认证审核** - 企业认证申请审核
 - **数据统计** - 平台运营数据分析和报表
 
-![图片占位符 - 管理后台界面](./docs/images/admin-panel.png)
+<img width="2559" height="1390" alt="image" src="https://github.com/user-attachments/assets/953fe7e3-c814-4679-abde-2ca639a4db4a" />
+
 
 ## 🏗️ 技术架构
-
-![图片占位符 - 系统架构图](./docs/images/architecture.png)
 
 ### 后端技术栈
 - **核心框架**: Spring Boot 3.4.7
@@ -161,28 +160,6 @@ mvn spring-boot:run
 - 测试企业账号: company/company123
 - 测试学生账号: student/student123
 
-![图片占位符 - 项目启动截图](./docs/images/startup-screen.png)
-
-## 📱 功能演示
-
-### 🎓 学生求职流程
-1. **注册登录** → **完善简历** → **搜索职位** → **投递简历** → **查看反馈** → **沟通面试**
-
-![图片占位符 - 学生求职流程图](./docs/images/student-job-flow.png)
-
-### 🏢 企业招聘流程
-1. **企业认证** → **发布职位** → **筛选简历** → **沟通候选人** → **面试安排** → **录用决策**
-
-![图片占位符 - 企业招聘流程图](./docs/images/company-recruit-flow.png)
-
-### 🛡️ 管理员审核流程
-1. **用户管理** → **企业认证审核** → **职位审核** → **内容管理** → **数据统计**
-
-![图片占位符 - 管理审核流程图](./docs/images/admin-review-flow.png)
-
-## 📊 数据库设计
-
-![图片占位符 - 数据库ER图](./docs/images/database-er.png)
 
 ### 核心数据表
 
@@ -200,24 +177,37 @@ mvn spring-boot:run
 
 ## 🎨 界面展示
 
-### 主要页面功能
+### 其它主要页面功能
 
-| 页面类型 | 页面名称 | 功能描述 | 截图占位符 |
-|----------|----------|----------|------------|
-| 🏠 **公共页面** | 系统首页 | 职位展示、平台介绍、用户入口 | ![首页](./docs/images/homepage.png) |
-| 🔐 **认证页面** | 登录页面 | 多角色统一登录入口 | ![登录页](./docs/images/login-page.png) |
-| 📝 **认证页面** | 注册页面 | 学生和企业注册入口 | ![注册页](./docs/images/register-page.png) |
-| 🔍 **学生端** | 职位搜索 | 智能职位搜索和筛选 | ![职位搜索](<img width="2559" height="1395" alt="image" src="https://github.com/user-attachments/assets/bd3d3047-97b0-4e66-a2fd-a590d02e3285" />
-) |
-| 📄 **学生端** | 职位详情 | 详细职位信息和投递 | ![职位详情](./docs/images/job-detail.png) |
-| 📋 **学生端** | 简历管理 | 在线简历编辑和管理 | ![简历管理](./docs/images/resume-management.png) |
-| ⭐ **学生端** | 人才中心 | 个人技能展示和推荐 | ![人才中心](./docs/images/talent-showcase.png) |
-| 📢 **企业端** | 职位发布 | 发布和管理招聘职位 | ![职位发布](./docs/images/job-publish-form.png) |
-| 👥 **企业端** | 简历筛选 | 查看和筛选候选人简历 | ![简历筛选](./docs/images/resume-screening.png) |
-| 🏛️ **企业端** | 企业认证 | 企业资质认证申请 | ![企业认证申请](./docs/images/company-auth-apply.png) |
-| 👤 **管理端** | 用户管理 | 系统用户信息管理 | ![用户管理](./docs/images/user-admin.png) |
-| 💼 **管理端** | 职位管理 | 职位审核和管理 | ![职位管理](./docs/images/job-admin.png) |
-| 🔍 **管理端** | 认证审核 | 企业认证申请审核 | ![认证审核](./docs/images/auth-admin.png) |
+### 系统首页
+职位展示、平台介绍、用户入口
+
+<img width="2548" height="1389" alt="屏幕截图 2025-06-19 235031" src="https://github.com/user-attachments/assets/49a91f6b-c338-4dc6-958f-b6143c4b0f4c" />
+
+## 🔐 认证页面
+
+### 登录页面
+多角色统一登录入口
+
+<img width="2559" height="1391" alt="image" src="https://github.com/user-attachments/assets/29347f6e-6b11-4b76-bea2-ed443142b8e7" />
+
+### 注册页面
+学生和企业注册入口
+
+<img width="2559" height="1392" alt="image" src="https://github.com/user-attachments/assets/9fb4b27e-a81f-4a47-89cf-727cf4cafdc9" />
+
+## 🔍 学生端
+
+### 职位搜索
+智能职位搜索和筛选
+
+<img width="2559" height="1395" alt="image" src="https://github.com/user-attachments/assets/bd3d3047-97b0-4e66-a2fd-a590d02e3285" />
+
+### 职位详情
+详细职位信息和投递
+
+<img width="2559" height="1359" alt="image" src="https://github.com/user-attachments/assets/93c6ec0b-34ce-4e70-a0ab-d820b85ee66f" />
+
 
 ## 🔒 安全特性
 
@@ -238,7 +228,6 @@ mvn spring-boot:run
 - **文件类型验证**: 严格的文件类型和大小限制
 - **文件存储**: 安全的文件存储路径和访问控制
 
-![图片占位符 - 安全架构图](./docs/images/security-architecture.png)
 
 ## 📈 系统特色
 
@@ -257,7 +246,6 @@ mvn spring-boot:run
 - **实时通知**: 重要消息即时推送
 - **操作便捷**: 简洁直观的用户界面
 
-![图片占位符 - 系统特色展示](./docs/images/system-features.png)
 
 ## 🚀 部署指南
 
@@ -266,27 +254,6 @@ mvn spring-boot:run
 2. 克隆项目并导入IDE
 3. 配置数据库连接信息
 4. 运行`mvn spring-boot:run`启动项目
-
-### 生产环境部署
-1. **构建项目**
-```bash
-mvn clean package -Dmaven.test.skip=true
-```
-
-2. **部署JAR包**
-```bash
-java -jar target/campus_job-0.0.1-SNAPSHOT.jar
-```
-
-3. **使用Docker部署**
-```dockerfile
-FROM openjdk:17-jdk-slim
-COPY target/campus_job-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app.jar"]
-```
-
-![图片占位符 - 部署架构图](./docs/images/deployment-architecture.png)
 
 ## 🤝 贡献指南
 
@@ -298,21 +265,23 @@ ENTRYPOINT ["java","-jar","/app.jar"]
 - **测试覆盖**: 保证核心功能测试覆盖率
 
 
-## 🆘 常见问题
+## 🆘 未来优化
+实现一键填充简历功能。
+
+聊天，消息提示功能。
 
 
 ## 📜 许可证
 
 本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
-
 ---
 
 <div align="center">
 
-**⭐ 如果这个项目对您有帮助，请给我们一个Star！⭐**
+**⭐ 课程初次尝试做项目，架构和功能不够完善，还请见谅，以后有时间再改吧，希望它能帮上你的忙，那样我会很开心⭐**
+![bc40f4ac7b75114eba1a88606cf7733a](https://github.com/user-attachments/assets/c518f0e3-59d8-4b47-a8a1-13300342d1a7)
 
-![图片占位符 - 项目统计徽章](./docs/images/project-stats.png)
 
 </div>
 ```
